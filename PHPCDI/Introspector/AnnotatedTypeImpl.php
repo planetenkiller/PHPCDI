@@ -83,4 +83,17 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
 
         return $methods;
     }
+    
+    public function getMethodsWithAnnotationOnFirstParameter($annotationClass) {
+        $methods = array();
+
+        foreach($this->methods as $method) {
+            $params = $method->getParameters();
+            if(count($params) > 0 && $params[0]->isAnnotationPresent($annotationClass)) {
+                $methods[] = $method;
+            }
+        }
+
+        return $methods;
+    }
 }

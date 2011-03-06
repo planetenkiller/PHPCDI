@@ -109,4 +109,20 @@ abstract class Beans {
 
         return $methods;
     }
+    
+    public static function compareQualifiers(array $a, array $b) {
+        foreach($b as $qualifier) {
+            foreach($a as $anno) {
+                $qualifierClass = \is_object($qualifier)? \get_class($qualifier) : $qualifier;
+                $annoClass = \is_object($anno)? \get_class($anno) : $anno;
+                if($qualifierClass == $annoClass) { //TODO check anno prop too
+                    continue 2;
+                }
+            }
+
+            return false;
+        }
+        
+        return true;
+    }
 }

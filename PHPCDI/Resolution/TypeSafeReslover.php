@@ -21,15 +21,8 @@ class TypeSafeReslover implements Resolver {
 
         foreach($this->beans as $bean) {
             if(\in_array($beanType, $bean->getTypes())) {
-                foreach($qualifiers as $qualifier) {
-                    foreach($bean->getQualifiers() as $anno) {
-                        $qualifierClass = \is_object($qualifier)? \get_class($qualifier) : $qualifier;
-                        if($qualifierClass == \get_class($anno)) { //TODO check anno prop too
-                            continue 2;
-                        }
-                    }
-
-                    continue 2;
+                if(!\PHPCDI\Util\Beans::compareQualifiers($bean->getQualifiers(), $qualifiers)) {
+                    continue;
                 }
 
                 $beans[] = $bean;

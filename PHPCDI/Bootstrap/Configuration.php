@@ -98,8 +98,26 @@ class Configuration {
     }
 
     private function createProducer($declaringBean, \PHPCDI\Introspector\AnnotatedTypeImpl $class, BeanManager $manager) {
+        $disposers = $class->getMethodsWithAnnotationOnFirstParameter('PHPCDI\API\Inject\Disposes');
+        
         foreach($class->getMethodsWithAnnotation('PHPCDI\API\Inject\Produces') as $method) {
-            $manager->addBean(new \PHPCDI\Bean\ProducerMethod($declaringBean, $method, $manager));
+            $disposer = null;
+            
+            foreach($disposers as $disposerMethod) {
+                $params = $disposerMethod->getParameters();
+                if(\in_array(\PHPCDI\Util\Annotations::getReturnType($method->getPHPMember()), $params[0]->getTypeClosure())
+                   && \PHPCDI\Util\Beans::compareQualifiers(\PHPCDI\Util\Annotations::getQualifiers($params[0]), 
+                                                            \PHPCDI\Util\Annotations::getQualifiers($method))) {
+                    if($disposer == null) {
+                        $disposer = $disposerMethod;
+                    } else {
+                        throw new \PHPCDI\API\Inject\DefinitionException('more than one disposer method for producer method '.$method->getPHPMember()->class.'::'.$method->getPHPMember()->name);
+                    }
+                }
+            }
+            
+            
+            $manager->addBean(new \PHPCDI\Bean\ProducerMethod($declaringBean, $method, $disposer, $manager));
         }
     }
 }

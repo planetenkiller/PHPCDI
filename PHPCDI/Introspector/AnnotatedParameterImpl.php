@@ -30,6 +30,7 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
             if($paramAnnotation != null) {
                 $this->baseType = $paramAnnotation->type;
                 $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($this->baseType));
+                $this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'] = $paramAnnotation;
             } else {
                 $this->baseType = 'mixed';
                 $this->allTypes = array('mixed');
@@ -37,6 +38,28 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
         } else {
             $this->baseType = 'mixed';
             $this->allTypes = array('mixed');
+        }
+        
+        if(isset($this->annotations['PHPCDI\API\Inject\P'])) {
+            // extract annotations for this parameter
+            $paramAnnotation = null;
+            if(\is_array($this->annotations['PHPCDI\API\Inject\P'])) {
+                foreach($this->annotations['PHPCDI\API\Inject\P'] as $param) {
+                    if($param->name == $parameter->name) {
+                        $paramAnnotation = $param;
+                    }
+                }
+            } else if($this->annotations['PHPCDI\API\Inject\P']->name == $parameter->name) {
+                $paramAnnotation = $this->annotations['PHPCDI\API\Inject\P'];
+            }
+            
+            // remove all annotaton holder annotations
+            unset($this->annotations['PHPCDI\API\Inject\P']);
+            
+            // add parameter annotations as first level annotations
+            foreach($paramAnnotation->value as $annotation) {
+                $this->annotations[\get_class($annotation)] = $annotation;
+            }
         }
     }
 
