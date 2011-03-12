@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCDI\API\Inject;
+namespace PHPCDI\API;
 
 class DefinitionException extends \Exception {
     public function __construct($message) {

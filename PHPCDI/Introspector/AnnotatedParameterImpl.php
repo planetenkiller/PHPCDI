@@ -15,7 +15,13 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
         $this->method = $method;
         $this->annotations = \PHPCDI\Util\Annotations::reader()->getMethodAnnotations($method->getPHPMember());
 
-        if(isset($this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'])) {
+        if($parameter->getClass() != null) {
+            $this->baseType = $parameter->getClass()->name;
+            $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($this->baseType));
+        } else if($parameter->isArray()) {
+            $this->baseType = 'array';
+            $this->allTypes = array('array', 'mixed');
+        } else if(isset($this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'])) {
             $paramAnnotation = null;
             if(\is_array($this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'])) {
                 foreach($this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'] as $param) {

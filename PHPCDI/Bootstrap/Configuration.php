@@ -65,11 +65,12 @@ class Configuration {
             $manager = $classBundleManager[$classBundle];
             foreach($classBundle->getClasses() as $class) {
                 $reflectionClass = new \ReflectionClass($class);
-                if(!$reflectionClass->isAbstract() && !$reflectionClass->isInterface()) {
+                if(\PHPCDI\Util\ReflectionUtil::isManagedBean($reflectionClass)) {
                     $type = new \PHPCDI\Introspector\AnnotatedTypeImpl($class);
                     $bean = new \PHPCDI\Bean\ManagedBean($class, $type, $manager);
                     $manager->addBean($bean);
                     $this->createProducer($bean, $type, $manager);
+                    $this->createObserver($bean, $type, $manager);
                 }
             }
         }
@@ -82,6 +83,7 @@ class Configuration {
             $parent = $classBundleManager[$classBundle];
         } else {
             $parent = new BeanManager($rootManager->getContexts());
+            $this->addBuiltinBeansToManager($parent);
             $classBundleManager[$classBundle] = $parent;
         }
 
@@ -119,5 +121,17 @@ class Configuration {
             
             $manager->addBean(new \PHPCDI\Bean\ProducerMethod($declaringBean, $method, $disposer, $manager));
         }
+    }
+
+    private function createObserver($declaringBean, \PHPCDI\Introspector\AnnotatedTypeImpl $class, BeanManager $manager) {
+        $observers = $class->getMethodsWithAnnotationOnFirstParameter('PHPCDI\API\Inject\Observes');
+
+        foreach($observers as $observer) {
+            $manager->addObserver(new \PHPCDI\Event\ObserverMethodImpl($declaringBean, $observer, $manager));
+        }
+    }
+
+    private function addBuiltinBeansToManager(BeanManager $beanManager) {
+        $beanManager->addBean(new \PHPCDI\Bean\Builtin\EventBean($beanManager));
     }
 }

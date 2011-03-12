@@ -64,4 +64,11 @@ interface BeanManager {
      * @return InjectionTarget
      */
     public function createInjectionTarget($annotatedType);
+    
+    public function fireEvent($eventData, array $qualifiers);
+    
+    /**
+     * @return array of ObserverMethod
+     */
+    public function resolveObserverMethods($eventData, array $qualifiers);
 }

@@ -8,28 +8,44 @@ namespace PHPCDI\Bean;
 class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
 
     private $beans;
-    private $beansIterator;
+    private $observers;
     private $contexts;
-    private $resolver;
+    
+    private $beansIterator;
+    private $observersIterator;
+    private $beanResolver;
+    private $observerReslover;
     private $accessibleManagers;
+    
+    /**
+     * @var \SplStack 
+     */
+    private $injectionPointStack;
 
     public function __construct(&$contexts=array()) {
         $this->accessibleManagers = array();
         $this->beans = new \ArrayObject(array());
         $this->beansIterator = new \ArrayIterator($this->beans);
         $this->contexts =& $contexts;
+        $this->observers = new \ArrayObject(array());
+        $this->observersIterator = new \ArrayIterator($this->observers);
+        $this->injectionPointStack = new \SplStack();
 
         $beans = $this->beans;
         $manager = $this;
-        $it = function() use ($manager, $beans) {
-            $it = new \AppendIterator();
-            $stack = array();
-            foreach(BeanManager::buildBeansIterator($manager, $stack) as $sit) {
-                $it->append($sit);
-            }
-            return $it;
+        $it = function () use (&$manager) {
+            return BeanManager::buildIterator($manager, function(BeanManager $manager) {
+                return $manager->getBeansIterator();
+            });
         };
-        $this->resolver = new \PHPCDI\Resolution\TypeSafeReslover(new \PHPCDI\Util\LazyIterator($it));
+        $this->beanResolver = new \PHPCDI\Resolution\TypeSafeBeanReslover(new \PHPCDI\Util\LazyIterator($it));
+        
+        $it2 = function () use (&$manager) {
+            return BeanManager::buildIterator($manager, function(BeanManager $manager) {
+                return $manager->getObserversIterator();
+            });
+        };
+        $this->observerReslover = new \PHPCDI\Resolution\TypeSafeObserverReslover(new \PHPCDI\Util\LazyIterator($it2));
     }
 
     public function addAccessibleBeanManager(BeanManager $manager) {
@@ -38,6 +54,10 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
 
     public function addBean(\PHPCDI\API\Inject\SPI\Bean $bean) {
         $this->beans[] = $bean;
+    }
+    
+    public function addObserver(\PHPCDI\API\Inject\SPI\ObserverMethod $observer) {
+        $this->observers[] = $observer;
     }
 
     public function addContext(\PHPCDI\API\Context\SPI\Context $context) {
@@ -61,7 +81,7 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
     }
 
     public function getBeans($beanType, $qualifiers) {
-        return $this->resolver->reslove($beanType, $qualifiers);
+        return $this->beanResolver->reslove($beanType, $qualifiers);
     }
 
     /**
@@ -96,7 +116,10 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
 
     public function getInjectableReference($ij, $ctx) {
         $bean = $this->resolve($this->getBeans($ij->getType(), $ij->getQualifiers()));
-        return $this->getRefernce($bean, $ij->getType(), $ctx);
+        $this->injectionPointStack->push($ij);
+        $obj = $this->getRefernce($bean, $ij->getType(), $ctx);
+        $this->injectionPointStack->pop();
+        return $obj;
     }
 
     public function getRefernce(\PHPCDI\API\Inject\SPI\Bean $bean, $beanType, \PHPCDI\API\Context\SPI\CreationalContext $ctx) {
@@ -139,11 +162,25 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
     public function validate($injectionPoint) {
 
     }
+    
+    public function getCurrentInjectionPoint() {
+        return $this->injectionPointStack->top();
+    }
+    
+    public static function buildIterator($manager, $valueCallback) {
+        $it = new \AppendIterator();
+        $stack = array();
+        foreach(self::getIteratorsRecursive($manager, $stack, $valueCallback) as $sit) {
+            $it->append($sit);
+        }
+        return $it;
+    }
 
-    public static function buildBeansIterator(BeanManager $manager, array &$stack) {
+    public static function getIteratorsRecursive(BeanManager $manager, array &$stack, $valueCallback) {
         $stack[] = $manager;
         $beans = array();
-        $beans[\spl_object_hash($manager->beansIterator)] = $manager->beansIterator;
+        $value = $valueCallback($manager);
+        $beans[\spl_object_hash($value)] = $value;
         foreach($manager->accessibleManagers as $accessibleManager) {
             // break circular references
             if(!\in_array($accessibleManager, $stack)) {
@@ -152,5 +189,23 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
         }
 
         return $beans;
+    }
+
+    public function fireEvent($eventData, array $qualifiers) {
+        foreach($this->resolveObserverMethods($eventData, $qualifiers) as $observerMethod) {
+            $observerMethod->notify($eventData);
+        }
+    }
+
+    public function resolveObserverMethods($eventData, array $qualifiers) {
+        return $this->observerReslover->reslove(\get_class($eventData), $qualifiers);
+    }
+
+    public function getBeansIterator() {
+        return $this->beansIterator;
+    }
+
+    public function getObserversIterator() {
+        return $this->observersIterator;
     }
 }

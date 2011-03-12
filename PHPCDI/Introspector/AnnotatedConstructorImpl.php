@@ -19,4 +19,8 @@ class AnnotatedConstructorImpl extends AbstractAnnotatedMethod implements \PHPCD
     public function isStatic() {
         return false;
     }
+
+    public function __toString() {
+        return 'Constructor of ' . $this->getPHPMember()->class;
+    }
 }

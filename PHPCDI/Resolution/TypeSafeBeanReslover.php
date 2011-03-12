@@ -3,9 +3,9 @@
 namespace PHPCDI\Resolution;
 
 /**
- * A reslover based on types of the beans.
+ * A bean reslover based on types/qualifiers of the beans.
  */
-class TypeSafeReslover implements Resolver {
+class TypeSafeBeanReslover implements Resolver {
 
     private $beans;
 

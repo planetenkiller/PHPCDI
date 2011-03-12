@@ -42,7 +42,7 @@ abstract class Beans {
 
             return $injectionPoints;
         } else if(\count($constructor->getParameters()) > 0) {
-            throw new \PHPCDI\API\Inject\DefinitionException('Found non @Inject constructor with at leas one paramter');
+            throw new \PHPCDI\API\DefinitionException('Found non @Inject constructor with at leas one paramter');
         } else {
             return array();
         }
@@ -113,14 +113,54 @@ abstract class Beans {
     public static function compareQualifiers(array $a, array $b) {
         foreach($b as $qualifier) {
             foreach($a as $anno) {
-                $qualifierClass = \is_object($qualifier)? \get_class($qualifier) : $qualifier;
-                $annoClass = \is_object($anno)? \get_class($anno) : $anno;
-                if($qualifierClass == $annoClass) { //TODO check anno prop too
+                if(self::compareQualifier($qualifier, $anno)) {
                     continue 2;
                 }
             }
 
             return false;
+        }
+        
+        return true;
+    }
+    
+    public static function compareQualifier($a, $b) {
+        $aClass = \is_object($a)? \get_class($a) : $a;
+        $bClass = \is_object($b)? \get_class($b) : $b;
+        
+        return $aClass == $bClass;  //TODO check anno prop too
+    }
+    
+    public static function mergeQualifiers(array $current, array $new) {
+        $checkedQualifiers = array();
+        foreach($new as $qualifier) {
+            $cls = new \ReflectionClass($qualifier);
+            if(!Annotations::isQualifier($cls)) {
+                throw new \InvalidArgumentException('Annotation ' . $cls->name . ' is not an qualifier');
+            } else if(isset($checkedQualifiers[$cls->name])) {
+                throw new \InvalidArgumentException('Redundant qualifiers: ' . $cls->name);
+            }
+            
+            $checkedQualifiers[$cls->name] = \is_string($qualifier)? $cls->newInstance(array()) : $qualifier;
+        }
+        
+        return \array_merge($checkedQualifiers, $current);
+    }
+    
+    public static function containsAllQualifiers(array $requiredQualifiers, array $qualifiers) {
+        
+        foreach($requiredQualifiers as $requiredQualifier) {
+            $matchFound = false;
+            foreach($qualifiers as $qualifier) {
+                if(self::compareQualifier($requiredQualifier, $qualifier)) {
+                    $matchFound = true;
+                    break;
+                }
+            }
+            
+            if(!$matchFound) {
+                return false;
+            }
         }
         
         return true;

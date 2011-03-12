@@ -42,5 +42,27 @@ class AnnotationParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(isset ($annos['PHPCDI\Util\PhpDoc\PhpDocReturn']));
         $this->assertEquals('Namespace\Cls', $annos['PHPCDI\Util\PhpDoc\PhpDocReturn']->type);
     }
+
+    /**
+     * @Annos(@Inject @Any $user)
+     * @param int           $a my a
+     */
+    public function testParmeterAnnotations() {
+        $parser = new AnnotationParser();
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader(null, $parser);
+        $reader->setAutoloadAnnotations(true);
+        $reader->setDefaultAnnotationNamespace('PHPCDI\API\Inject\\');
+
+        $annos = $reader->getMethodAnnotations(new \ReflectionMethod('PHPCDI\Util\AnnotationParserTest', 'testParmeterAnnotations'));
+
+        $this->assertNotNull($annos);
+        $this->assertEquals(2, \count($annos));
+        $this->assertTrue(isset ($annos['PHPCDI\API\Inject\P']));
+        $this->assertEquals('user', $annos['PHPCDI\API\Inject\P']->name);
+        $this->assertTrue(\is_array($annos['PHPCDI\API\Inject\P']->value));
+        $this->assertEquals(2, \count($annos['PHPCDI\API\Inject\P']->value));
+        $this->assertInstanceOf('PHPCDI\API\Inject\Inject', $annos['PHPCDI\API\Inject\P']->value[0]);
+        $this->assertInstanceOf('PHPCDI\API\Inject\Any', $annos['PHPCDI\API\Inject\P']->value[1]);
+    }
 }
 

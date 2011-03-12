@@ -57,4 +57,17 @@ abstract class ReflectionUtil {
 
         return $store;
     }
+
+    public static function isManagedBean(\ReflectionClass $reflectionClass) {
+        $isAbstract = $reflectionClass->isAbstract() || $reflectionClass->isInterface();
+        $isAnnotation = \in_array('Doctrine\Common\Annotations\Annotation', \class_parents($reflectionClass->name));
+        $hasAtInject = $reflectionClass->getConstructor() != null
+                           ? Annotations::reader()->getMethodAnnotation($reflectionClass->getConstructor(), 'PHPCDI\API\Inject\Inject') != null
+                           : false;
+        $hasParameter = $reflectionClass->getConstructor() != null
+                            ? $reflectionClass->getConstructor()->getNumberOfParameters() > 0
+                            : false;
+
+        return !$isAbstract && !$isAnnotation && (!$hasParameter || ($hasParameter && $hasAtInject));
+    }
 }
