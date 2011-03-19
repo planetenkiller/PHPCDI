@@ -17,7 +17,7 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
     /**
      * @var \PHPCDI\API\Inject\SPI\AnnotatedType
      */
-    private $annotatedType;
+    protected $annotatedType;
 
     private $injectionPoints;
 
@@ -32,6 +32,8 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
     private $scope;
 
     private $postConstructMethods;
+    
+    private $decorators;
 
     /**
      * @var BeanManager
@@ -123,14 +125,28 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         foreach($constructorParamInjectionPoints as $injection) {
             $args[] = $this->beanManager->getInjectableReference($injection, $creationalContext);
         }
+        
+        $reflectionClass = $this->annotatedType->getPHPClass();
+        
+        if($this->isProxyRequired()) {
+            $proxyfactory = new \PHPCDI\Proxy\ProxyFactory();
+            $reflectionClass = $proxyfactory->extend($reflectionClass->name)->createClass();
+        }
 
         if(!empty($args)) {
-            return $this->annotatedType->getPHPClass()->newInstanceArgs($args);
+            return $reflectionClass->newInstanceArgs($args);
         } else {
-            return $this->annotatedType->getPHPClass()->newInstance();
+            return $reflectionClass->newInstance();
         }
     }
+    
+    protected function isProxyRequired() {
+        return $this->hasDecorators();
+    }
 
+    /**
+     * @return BeanManager
+     */
     public function getBeanManager() {
         return $this->beanManager;
     }
@@ -145,6 +161,29 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
 
     public function getPostConstructMethods() {
         return $this->postConstructMethods;
+    }
+    
+    public function getDecorators() {
+        if($this->decorators == null) {
+            $this->decorators = $this->beanManager->resolveDecorators($this->getTypes(), $this->getQualifiers());
+        }
+        
+        return $this->decorators;
+    }
+    
+    public function hasDecorators() {
+        return $this->getDecorators() != null && \count($this->getDecorators()) > 0;
+    }
+    
+    public function applyDecorators(\PHPCDI\Proxy\ProxyObject $obj, \PHPCDI\API\Context\SPI\CreationalContext $ctx, \PHPCDI\API\Inject\SPI\InjectionPoint $ij) {
+        $decorationHelper = new \PHPCDI\Decorator\DecorationHelper($obj, $this, $this->beanManager);
+        \PHPCDI\Decorator\DecorationHelper::getHelperStack()->push($decorationHelper);
+        $firstDelegate = $decorationHelper->getNextDelegate($ij, $ctx);
+        \PHPCDI\Decorator\DecorationHelper::getHelperStack()->pop();
+        
+        $obj->setHandler(new \PHPCDI\Decorator\InterceptorAndDecoratorProxyMethodHandler($firstDelegate));
+        
+        return $obj;
     }
 }
 

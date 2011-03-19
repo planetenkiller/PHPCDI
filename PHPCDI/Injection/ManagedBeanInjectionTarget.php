@@ -44,8 +44,14 @@ class ManagedBeanInjectionTarget implements InjectionTarget {
      * @param \PHPCDI\API\Context\SPI\CreationalContext $creationalContext
      */
     public function produce($creationalContext) {
-        $instance = $this->bean->createInstance($creationalContext);
-        $creationalContext->push($instance);
+        if(!$this->bean->hasDecorators()) {
+            $instance = $this->bean->createInstance($creationalContext);
+            $creationalContext->push($instance);
+        } else {
+            $obj = $this->bean->createInstance($creationalContext);
+            $this->bean->applyDecorators($obj, $creationalContext, $this->bean->getBeanManager()->getCurrentInjectionPoint());
+            return $obj;
+        }
         return $instance;
     }
 }

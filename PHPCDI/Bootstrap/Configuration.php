@@ -67,10 +67,16 @@ class Configuration {
                 $reflectionClass = new \ReflectionClass($class);
                 if(\PHPCDI\Util\ReflectionUtil::isManagedBean($reflectionClass)) {
                     $type = new \PHPCDI\Introspector\AnnotatedTypeImpl($class);
-                    $bean = new \PHPCDI\Bean\ManagedBean($class, $type, $manager);
-                    $manager->addBean($bean);
-                    $this->createProducer($bean, $type, $manager);
-                    $this->createObserver($bean, $type, $manager);
+                    
+                    if($type->isAnnotationPresent('PHPCDI\API\Inject\Decorator')) {
+                        $decorator = new \PHPCDI\Bean\DecoratorImpl($class, $type, $manager);
+                        $manager->addDecorator($decorator);
+                    } else {
+                        $bean = new \PHPCDI\Bean\ManagedBean($class, $type, $manager);
+                        $manager->addBean($bean);
+                        $this->createProducer($bean, $type, $manager);
+                        $this->createObserver($bean, $type, $manager);
+                    }
                 }
             }
         }
