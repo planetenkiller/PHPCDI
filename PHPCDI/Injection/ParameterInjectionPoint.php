@@ -23,6 +23,10 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
         $this->bean = $bean;
         $this->paramter = $paramter;
         $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($this->paramter);
+        
+        if(empty($this->qualifiers)) {
+            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+        }
     }
 
     public function getType() {

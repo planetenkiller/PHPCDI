@@ -60,7 +60,7 @@ abstract class Beans {
             }
         }
 
-        return $method;
+        return $initializerMethodsList;
     }
 
     public static function getFieldInjectionPoints(Bean $declaringBean, AnnotatedType $class) {

@@ -30,7 +30,12 @@ class FileScanClassBundle implements \PHPCDI\API\Bootstrap\ClassBundle {
         $this->bundles = array();
         $this->classes = array();
         $this->id = $id;
-        $this->scan($classRoot, $rootNamespace);
+        
+        if($rootNamespace[0] != '\\') {
+            $rootNamespace = '\\' . $rootNamespace;
+        }
+        
+        $this->scan(realpath($classRoot), $rootNamespace);
     }
 
     protected function scan($classRoot, $rootNamespace) {
@@ -38,12 +43,12 @@ class FileScanClassBundle implements \PHPCDI\API\Bootstrap\ClassBundle {
 
         foreach($it as $file) {
             if(!$it->isDot() && $file->isFile() && $file->isReadable() && substr($file->getFilename(), -4) == '.php') {
-                $folder = str_replace('./', '', $file->getPath());
+                $folder = str_replace($classRoot, '', $file->getPath());
                 $namespace = str_replace('/', '\\', $folder) . '\\';
                 $className = substr($file->getBasename(), 0,  strrpos($file->getBasename(), '.php'));
 
                 if(\strpos($namespace, $rootNamespace) === 0) {
-                    $this->classes[] = $namespace.$className;
+                    $this->classes[] = ltrim($namespace.$className, '\\');
                 }
             }
         }

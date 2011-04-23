@@ -105,7 +105,7 @@ abstract class Annotations {
 
             foreach($annotations as $anno) {
                 if(self::isStereotype(new \ReflectionClass($anno))) {
-                    $stereotypeAnnotations[\get_class($anno)] = self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
+                    self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
                 }
             }
             return $stereotypeAnnotations;
@@ -118,7 +118,7 @@ abstract class Annotations {
 
             foreach($annotations as $anno) {
                 if(self::isStereotype(new \ReflectionClass($anno))) {
-                    $stereotypeAnnotations[\get_class($anno)] = self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
+                   self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
                 }
             }
             return $stereotypeAnnotations;
@@ -131,7 +131,7 @@ abstract class Annotations {
 
             foreach($annotations as $anno) {
                 if(self::isStereotype(new \ReflectionClass($anno))) {
-                    $stereotypeAnnotations[\get_class($anno)] = self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
+                    self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
                 }
             }
             return $stereotypeAnnotations;
@@ -144,15 +144,13 @@ abstract class Annotations {
         $reader = self::reader();
         $annos = $reader->getClassAnnotations($stereotype);
         
-        $annotations = array();
         foreach($annos as $anno) {
             if(self::isStereotype(new \ReflectionClass($anno)) && !isset($stereotypeAnnotations[\get_class($anno)])) {
-                $stereotypeAnnotations[\get_class($anno)] = self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
+                self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
             } else if(!($anno instanceof Stereotype)) {
-                $annotations[] = $anno;
+                $stereotypeAnnotations[\get_class($anno)] = $anno;
             }
         }
-        return $annotations;
     }
 
     public static function isScope(\ReflectionClass $annotationClass) {
@@ -164,10 +162,11 @@ abstract class Annotations {
 
     /**
      * @param Annotated $annotated
+     * @param boolean $useDefault if true this function will never return null
      *
-     * @return string Scope annotation, never null
+     * @return string Scope annotation
      */
-    public static function getScope(Annotated $annotated) {
+    public static function getScope(Annotated $annotated, $useDefault=true) {
         $reader = self::reader();
         
         $scope = null;
@@ -212,11 +211,15 @@ abstract class Annotations {
             }
         }
 
-        if($scope == null) {
+        if($scope == null && $useDefault) {
             $scope = new \PHPCDI\API\Inject\Dependent(array());
+        } 
+        
+        if($scope == null) {
+            return null;
+        } else {
+            return \get_class($scope);
         }
-
-        return \get_class($scope);
     }
 
     public static function getReturnType(\ReflectionMethod $method) {
@@ -229,5 +232,18 @@ abstract class Annotations {
         $reader = self::reader();
         $annotation = $reader->getPropertyAnnotation($property, 'PHPCDI\Util\PhpDoc\PhpDocVar');
         return $annotation != null? $annotation->type : null;
+    }
+    
+    public static function listHasAnnotation($listWithAnnotationObjects, $annotationClass) {
+        $found = false;
+        
+        foreach($listWithAnnotationObjects as $annotation) {
+            if(get_class($annotation) == $annotationClass) {
+                $found = true;
+                break;
+            }
+        }
+        
+        return $found;
     }
 }

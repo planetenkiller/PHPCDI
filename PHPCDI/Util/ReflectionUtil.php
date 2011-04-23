@@ -15,6 +15,8 @@ abstract class ReflectionUtil {
                 }
             }
         }
+        
+        $store[] = 'mixed';
 
         return \array_unique($store);
     }
@@ -69,5 +71,19 @@ abstract class ReflectionUtil {
                             : false;
 
         return !$isAbstract && !$isAnnotation && (!$hasParameter || ($hasParameter && $hasAtInject));
+    }
+    
+    public static function decapitalize($name) {
+	if (empty($name)) {
+	    return $name;
+	}
+	if (strlen($name) > 1 
+            && strtoupper($name[1]) == $name[1] 
+            && strtoupper($name[0]) == $name[0]){
+	    return $name;
+	}
+	
+        $name[0] = strtolower($name[0]);
+        return $name;
     }
 }

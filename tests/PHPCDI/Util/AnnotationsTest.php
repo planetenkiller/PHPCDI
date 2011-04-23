@@ -88,8 +88,8 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($stereotypes);
         $this->assertEquals(2, count($stereotypes));
-        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $stereotypes['PHPCDI\Util\AnnotationsTestStereotypeAnnotation'][0]);
-        $this->assertInstanceOf('PHPCDI\API\Inject\Any', $stereotypes['PHPCDI\Util\AnnotationsTestStereotypeAnnotation2'][0]);
+        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $stereotypes['PHPCDI\API\Inject\DefaultObj']);
+        $this->assertInstanceOf('PHPCDI\API\Inject\Any', $stereotypes['PHPCDI\API\Inject\Any']);
     }
 
     public function testIsScope() {
