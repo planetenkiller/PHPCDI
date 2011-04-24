@@ -23,6 +23,10 @@ class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
         $this->bean = $bean;
         $this->paramter = $paramter;
         $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($this->paramter);
+        
+        if(empty($this->qualifiers)) {
+            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+        }
     }
 
     public function getType() {
@@ -64,5 +68,9 @@ class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
         $reflectionField = $this->getMember();
         $reflectionField->setAccessible(true);
         $reflectionField->setValue($declaringInstance, $objectToInject);
+    }
+    
+    public function __toString() {
+        return "Class attribute injection point " . $this->paramter->getDeclaringType()->getBaseType() . '::' . $this->paramter->getPHPMember()->name;
     }
 }

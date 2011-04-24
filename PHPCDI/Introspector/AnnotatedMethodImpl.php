@@ -9,7 +9,7 @@ class AnnotatedMethodImpl extends AbstractAnnotatedMethod implements \PHPCDI\API
         parent::__construct(\PHPCDI\Util\Annotations::reader()->getMethodAnnotations($method),
                             !empty($returnType)? $returnType : 'mixed',
                             !empty($returnType)?
-                                \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($returnType))
+                                \PHPCDI\Util\ReflectionUtil::getClassNames($returnType)
                               :
                                 array('mixed'),
                             $class,

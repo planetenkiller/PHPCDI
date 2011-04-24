@@ -173,7 +173,8 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
         if(count($beans) == 1) {
             return $beans[0];
         } else if(count($beans) > 1) {
-            throw new \RuntimeException("ambiguous beans for dependency: ".\print_r($beans, true));
+            throw new \PHPCDI\API\AmbiguousResolutionException(
+                    "ambiguous beans for dependency: " . \PHPCDI\Util\Beans::toString($beans));
         } else {
             return null;
         }
@@ -235,5 +236,12 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
     
     public function getDecoratorsIterator() {
         return $this->decoratorsIterator;
+    }
+    
+    /**
+     * @return \SplStack 
+     */
+    public function getInjectionPointStack() {
+        return $this->injectionPointStack;
     }
 }

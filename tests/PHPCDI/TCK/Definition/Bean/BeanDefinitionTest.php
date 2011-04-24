@@ -26,16 +26,17 @@ class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
         $this->assertEquals('PHPCDI\API\Inject\Dependent', $list[0]->getScope());
     }
     
-// todo port to php after full primitive types support
-//   public void testIsNullable() throws Exception
-//   {
-//      assert getBeans(int.class).size() == 1;
-//      Bean<Integer> bean = getBeans(int.class).iterator().next();
-//      assert !bean.isNullable();
-//      assert getBeans(Animal.class, TAME_LITERAL).size() == 1;
-//      Bean<Animal> animalBean = getBeans(Animal.class, TAME_LITERAL).iterator().next();
-//      assert animalBean.isNullable();
-//   }
+    public function testIsNullable() {
+        $this->assertEquals(1, count($this->getBeans('int', array(), false)));
+        $this->assertEquals(1, count($this->getBeans('integer', array(), false)));
+        $bean = $this->getBean('int', array(), false);
+        $this->assertFalse($bean->isNullable());
+        
+        $this->assertEquals(1, count($this->getBeans('Animal', array(Tame::newInstance()))));
+        $bean = $this->getBeans('Animal', array(Tame::newInstance()));
+        $bean = $bean[0];
+        $this->assertTrue($bean->isNullable());
+    }
     
     public function testBeanTypes() {
         $bean = $this->getBean('Tarantula');

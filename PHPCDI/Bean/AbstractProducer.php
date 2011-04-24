@@ -76,6 +76,6 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
     }
 
     public function isNullable() {
-        return true;
+        return !\PHPCDI\Util\ReflectionUtil::isPrimitiveType($this->member->getBaseType());
     }
 }

@@ -125,10 +125,10 @@ abstract class Beans {
     }
     
     public static function compareQualifier($a, $b) {
-        $aClass = \is_object($a)? \get_class($a) : $a;
-        $bClass = \is_object($b)? \get_class($b) : $b;
+        $aObj = \is_object($a)? $a : new $a(array());
+        $bObj = \is_object($b)? $b : new $b(array());
         
-        return $aClass == $bClass;  //TODO check anno prop too
+        return ($aObj == $bObj); // compared class and class attribute values
     }
     
     public static function mergeQualifiers(array $current, array $new) {
@@ -164,5 +164,16 @@ abstract class Beans {
         }
         
         return true;
+    }
+    
+    public static function toString(array $beans) {
+        $string = '[';
+        
+        foreach($beans as $bean) {
+            $string .= $bean->__toString() . ', ';
+        }
+        
+        $string .= ']';
+        return $string;
     }
 }

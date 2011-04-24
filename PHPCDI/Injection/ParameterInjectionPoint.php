@@ -62,4 +62,8 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     public function isTransient() {
         return false;
     }
+    
+    public function __toString() {
+        return "Method parameter injection point " . $this->paramter->getDeclaringCallable()->getBaseType() . '->' . $this->paramter->getName();
+    }
 }

@@ -3,22 +3,48 @@
 namespace PHPCDI\Util;
 
 abstract class ReflectionUtil {
-    public static function getClassNames(\ReflectionClass $reflectionClass) {
+    private static $PRIMITIVE_TYPES = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'mixed');
+    private static $PRIMITIVE_TYPE_ALIASES = array('bool' => 'boolean',
+                                                   'boolean' => 'bool',
+                                                   'int' => 'integer',
+                                                   'integer' => 'int');
+
+
+    public static function isPrimitiveType($typeName) {
+        return in_array($typeName, self::$PRIMITIVE_TYPES);
+    }
+    
+    public static function getClassNames($className) {
         $store = array();
 
-        for($class=$reflectionClass; $class != null; $class = $class->getParentClass()) {
-            $store[] = $class->name;
-            foreach($class->getInterfaces() as $interface) {
-                $store[] = $interface->name;
-                for($extendedInterface=$interface->getParentClass(); $extendedInterface != null; $extendedInterface=$extendedInterface->getParentClass()) {
-                    $store[] = $extendedInterface->name;
+        if(!($className instanceof \ReflectionClass) && in_array($className, self::$PRIMITIVE_TYPES)) {
+            if($className != 'mixed') {
+                $types = array($className, 'mixed');
+                
+                if(isset(self::$PRIMITIVE_TYPE_ALIASES[$className])) {
+                    $types[] = self::$PRIMITIVE_TYPE_ALIASES[$className];
+                }
+                
+                return $types;
+            } else {
+                return 'mixed';
+            }
+        } else {
+            $reflectionClass = ($className instanceof \ReflectionClass)? $className : new \ReflectionClass($className);
+            for($class=$reflectionClass; $class != null; $class = $class->getParentClass()) {
+                $store[] = $class->name;
+                foreach($class->getInterfaces() as $interface) {
+                    $store[] = $interface->name;
+                    for($extendedInterface=$interface->getParentClass(); $extendedInterface != null; $extendedInterface=$extendedInterface->getParentClass()) {
+                        $store[] = $extendedInterface->name;
+                    }
                 }
             }
-        }
-        
-        $store[] = 'mixed';
 
-        return \array_unique($store);
+            $store[] = 'mixed';
+
+            return \array_unique($store);
+        }
     }
     
     public static function getAllFields(\ReflectionClass $reflectionClass) {

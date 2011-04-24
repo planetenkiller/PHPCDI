@@ -139,5 +139,6 @@ class Configuration {
 
     private function addBuiltinBeansToManager(BeanManager $beanManager) {
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\EventBean($beanManager));
+        $beanManager->addBean(new \PHPCDI\Bean\Builtin\InstanceBean($beanManager));
     }
 }

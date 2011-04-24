@@ -238,5 +238,9 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         
         return $obj;
     }
+    
+    public function __toString() {
+        return "ManagedBean of class " . $this->className;
+    }
 }
 

@@ -41,8 +41,10 @@ abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {
      * 
      * @return array
      */
-    protected function getBeans($class, $qulaifiers=array()) {
-        return $this->manager->getBeans($this->testClassNamespace . $class, $qulaifiers);
+    protected function getBeans($class, $qulaifiers=array(), $prefixWithNamespace=true) {
+        return $this->manager->getBeans(
+                ($prefixWithNamespace)? $this->testClassNamespace . $class : $class, 
+                $qulaifiers);
     }
     
     /**
@@ -50,8 +52,8 @@ abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {
      * 
      * @return array
      */
-    protected function getBean($class) {
-        $list = $this->manager->getBeans($this->testClassNamespace . $class, array());
+    protected function getBean($class, $qulaifiers=array(), $prefixWithNamespace=true) {
+        $list = $this->getBeans($class, $qulaifiers, $prefixWithNamespace);
         
         return $list[0];
     }

@@ -41,5 +41,9 @@ abstract class ForwardingInjectionPoint implements InjectionPoint {
     public function isTransient() {
         return $this->getDelegate()->isTransient();
     }
+    
+    public function __toString() {
+        return $this->getDelegate()->__toString();
+    }
 }
 

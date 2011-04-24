@@ -5,6 +5,6 @@ namespace PHPCDI\API\Inject;
 /**
  * @Qualifier
  */
-class Any extends \Doctrine\Common\Annotations\Annotation {
+class Any extends \PHPCDI\API\Annotation {
 }
 

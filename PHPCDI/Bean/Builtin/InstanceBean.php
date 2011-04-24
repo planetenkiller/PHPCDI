@@ -4,7 +4,7 @@ namespace PHPCDI\Bean\Builtin;
 
 use PHPCDI\API\Inject\SPI\Bean;
 
-class EventBean implements Bean, DynamicLookupUnsupported {
+class InstanceBean implements Bean, DynamicLookupUnsupported {
     
     /**
      * @var \PHPCDI\Bean\BeanManager 
@@ -21,7 +21,12 @@ class EventBean implements Bean, DynamicLookupUnsupported {
         if($ij == null) {
             return null;
         } else {
-            return new \PHPCDI\Event\EventImpl($ij, $this->beanManager);
+            $annotation = $ij->getAnnotated()->getAnnotation('PHPCDI\API\Inject\Instance');
+            if($annotation == null || empty($annotation->value)) {
+                throw new \PHPCDI\API\Inject\DefinitionException('Instance injection point [' . $ij . '] must declare its Instance data type with a @Instance annotation');
+            }
+            
+            return new InstanceImpl($ij, $annotation->value, $this->beanManager, $creationalContext);
         }
     }
 
@@ -30,7 +35,7 @@ class EventBean implements Bean, DynamicLookupUnsupported {
     }
 
     public function getBeanClass() {
-        return 'PHPCDI\Event\EventImpl';
+        return 'PHPCDI\Bean\Builtin\InstanceImpl';
     }
 
     public function getInjectionPoints() {
@@ -54,7 +59,7 @@ class EventBean implements Bean, DynamicLookupUnsupported {
     }
 
     public function getTypes() {
-        return array('PHPCDI\API\Event\Event', 'mixed');
+        return array('PHPCDI\API\Instance\Instance', 'mixed');
     }
 
     public function isAlternative() {
@@ -66,6 +71,6 @@ class EventBean implements Bean, DynamicLookupUnsupported {
     }
     
     public function __toString() {
-        return "Builtin Bean for class PHPCDI\API\Event\Event";
+        return "Builtin Bean for class PHPCDI\API\Instance\Instance";
     }
 }
