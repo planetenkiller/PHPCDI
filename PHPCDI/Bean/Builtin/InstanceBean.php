@@ -4,7 +4,7 @@ namespace PHPCDI\Bean\Builtin;
 
 use PHPCDI\API\Inject\SPI\Bean;
 
-class InstanceBean implements Bean, DynamicLookupUnsupported {
+class InstanceBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     
     /**
      * @var \PHPCDI\Bean\BeanManager 

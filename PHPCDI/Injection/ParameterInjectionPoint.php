@@ -64,6 +64,6 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
     
     public function __toString() {
-        return "Method parameter injection point " . $this->paramter->getDeclaringCallable()->getBaseType() . '->' . $this->paramter->getName();
+        return "Method parameter injection point " . $this->paramter->getDeclaringCallable()->getDeclaringType()->getBaseType() . '->' . $this->paramter->getDeclaringCallable()->getPHPMember()->name . '(' . $this->paramter->getName() . ')';
     }
 }

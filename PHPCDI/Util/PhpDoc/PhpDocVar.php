@@ -3,7 +3,7 @@
 namespace PHPCDI\Util\PhpDoc;
 
 /**
- * Phpdoc @var annotation
+ * Phpdoc var annotation
  */
 class PhpDocVar extends \Doctrine\Common\Annotations\Annotation {
 

@@ -18,6 +18,7 @@ class ProducerMethod extends AbstractProducer {
     private $disposer;
 
     public function __construct(Bean $declaringBean, AnnotatedMethod $method, $disposer, BeanManager $beanManager) {
+        $methodName = $method->getPHPMember()->name;
         $ij = \PHPCDI\Util\Beans::getParameterInjectionPoints($declaringBean, $method);
         parent::__construct($declaringBean, $method, $ij);
         $this->disposer = $disposer;
@@ -30,7 +31,7 @@ class ProducerMethod extends AbstractProducer {
 
         $values = array();
         foreach ($this->getInjectionPoints() as $injection) {
-            $values[] = $this->beanManager->getInjectableReference($injection, $ctx);
+            $values[] = $this->beanManager->getInjectableReference($injection, $creationalContext);
         }
 
         if(\count($values) > 0) {
@@ -65,5 +66,9 @@ class ProducerMethod extends AbstractProducer {
                 $creationalContext->release();
             }
         }
+    }
+    
+    public function __toString() {
+        return "Producer method: [" . $this->declaringBean . ']->' . $this->member->getPHPMember()->name;
     }
 }

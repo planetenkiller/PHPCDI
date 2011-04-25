@@ -3,7 +3,7 @@
 namespace PHPCDI\Util\PhpDoc;
 
 /**
- * Phpdoc @param annotation
+ * Phpdoc param annotation
  */
 class PhpDocParam extends \Doctrine\Common\Annotations\Annotation {
 

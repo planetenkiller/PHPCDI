@@ -58,7 +58,7 @@ abstract class Annotations {
             $annotations = $reader->getMethodAnnotations($annotatedType->getPHPMember());
             $qualifierAnnotations = array();
             foreach($annotations as $anno) {
-                if(self::isQualifier(new \ReflectionClass($anno))) {
+                if(!is_array($anno) && self::isQualifier(new \ReflectionClass($anno))) {
                     $qualifierAnnotations[] = $anno;
                 }
             }
@@ -117,7 +117,7 @@ abstract class Annotations {
             $stereotypeAnnotations = array();
 
             foreach($annotations as $anno) {
-                if(self::isStereotype(new \ReflectionClass($anno))) {
+                if(!is_array($anno) && self::isStereotype(new \ReflectionClass($anno))) {
                    self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
                 }
             }
@@ -188,7 +188,7 @@ abstract class Annotations {
         } else if($annotated instanceof AnnotatedCallable) {
             $annos = $reader->getMethodAnnotations($annotated->getPHPMember());
             foreach($annos as $anno) {
-                if(self::isScope(new \ReflectionClass($anno))) {
+                if(!is_array($anno) && self::isScope(new \ReflectionClass($anno))) {
                     if($scope != null) {
                         throw new \PHPCDI\API\Inject\DefinitionException('Producer method '.$annotated->getPHPMember()->name.' of bean '.$annotated->getPHPMember()->class.' contains more than one scope annotation');
                     } else {

@@ -45,19 +45,22 @@ class Configuration {
         $classBundleManager = new \SplObjectStorage();
         $rootManager = $this->buildManager($classBundleManager);
 
-        return new \PHPCDI\Container($this->deployment, $rootManager, $classBundleManager);
+        $container = new \PHPCDI\Container($this->deployment, $rootManager, $classBundleManager);
+        
+        $rootManager->fireEvent(new \PHPCDI\API\Event\ContainerInitialized(), array());
+        
+        return $container;
     }
 
     private function buildManager(\SplObjectStorage $classBundleManager) {
-        $manager = new \PHPCDI\Bean\BeanManager();
+        $rootmanager = new \PHPCDI\Bean\BeanManager('root');
         foreach($this->contexts as $context) {
-            $manager->addContext($context);
+            $rootmanager->addContext($context);
         }
 
         // create managers
-        $stack = array();
         foreach($this->deployment->getClassBundles() as $classBundle) {
-            $this->createManagerAndDeploy($classBundle, $manager, $classBundleManager, $stack);
+            $this->createManagerAndDeploy($classBundle, $rootmanager, $classBundleManager, new \SplObjectStorage());
         }
 
         // build beans and add them to the managers
@@ -81,23 +84,24 @@ class Configuration {
             }
         }
 
-        return $manager;
+        return $rootmanager;
     }
 
-    private function createManagerAndDeploy(ClassBundle $classBundle, BeanManager $rootManager, \SplObjectStorage $classBundleManager, array &$stack) {
+    private function createManagerAndDeploy(ClassBundle $classBundle, BeanManager $rootManager, \SplObjectStorage $classBundleManager, \SplObjectStorage $stack) {
         if(isset($classBundleManager[$classBundle])) {
             $parent = $classBundleManager[$classBundle];
         } else {
-            $parent = new BeanManager($rootManager->getContexts());
+            $parent = new BeanManager($classBundle->getId(), $rootManager->getContexts(), $rootManager->getInjectionPointStack());
             $this->addBuiltinBeansToManager($parent);
             $classBundleManager[$classBundle] = $parent;
+            $rootManager->addAccessibleBeanManager($parent);
         }
 
-        $stack[] = $classBundle;
+        $stack->attach($classBundle);
 
         foreach($classBundle->getClassBundles() as $subClassBundle) {
             // break circular references
-            if(!\in_array($subClassBundle, $stack)) {
+            if(!$stack->contains($subClassBundle)) {
                 $parent->addAccessibleBeanManager($this->createManagerAndDeploy($subClassBundle, $rootManager, $classBundleManager, $stack));
             }
         }
@@ -140,5 +144,6 @@ class Configuration {
     private function addBuiltinBeansToManager(BeanManager $beanManager) {
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\EventBean($beanManager));
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\InstanceBean($beanManager));
+        $beanManager->addBean(new \PHPCDI\Bean\Builtin\InjectionPointBean($beanManager));
     }
 }

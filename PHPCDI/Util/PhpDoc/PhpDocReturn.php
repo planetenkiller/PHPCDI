@@ -3,7 +3,7 @@
 namespace PHPCDI\Util\PhpDoc;
 
 /**
- * Phpdoc @return annotation
+ * Phpdoc return annotation
  */
 class PhpDocReturn extends \Doctrine\Common\Annotations\Annotation {
 
