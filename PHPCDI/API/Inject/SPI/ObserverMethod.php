@@ -18,6 +18,11 @@ interface ObserverMethod {
     public function getObservedType();
     
     /**
+     * @return string
+     */
+    public function getObservedTypeFilter();
+    
+    /**
      * @return array of annotation objects or strings
      */
     public function getObservedQualifiers();

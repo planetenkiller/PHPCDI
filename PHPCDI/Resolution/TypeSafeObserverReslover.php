@@ -18,9 +18,19 @@ class TypeSafeObserverReslover implements Resolver {
 
     public function reslove($beanType, $qualifiers) {
         $observers = array();
+        $typeFilter = null;
 
+        if(is_array($beanType)) {
+            $typeFilter = $beanType[1];
+            $beanType = $beanType[0];
+        }
+        
         foreach($this->observers as $observer) {
-            if(\in_array($observer->getObservedType(), \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($beanType)))) {
+            if(\in_array($observer->getObservedType(), \PHPCDI\Util\ReflectionUtil::getClassNames($beanType))) {
+                if($typeFilter && !\in_array($observer->getObservedTypeFilter(), \PHPCDI\Util\ReflectionUtil::getClassNames($typeFilter))) {
+                    continue;
+                }
+                
                 if(!\PHPCDI\Util\Beans::containsAllQualifiers($observer->getObservedQualifiers(), $qualifiers)) {
                     continue;
                 }

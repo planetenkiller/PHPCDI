@@ -152,6 +152,10 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
             $registerInjectionPoint = $ij->getType() != 'PHPCDI\API\Inject\SPI\InjectionPoint';
             $bean = $this->resolve($this->getBeans($ij->getType(), $ij->getQualifiers()));
             
+            if($bean == null) {
+                throw new \LogicException('Can not satisfy injection point [' . $ij . ']');
+            }
+            
             if($registerInjectionPoint) {
                 $this->injectionPointStack->push($ij);
             }
@@ -239,13 +243,16 @@ class BeanManager implements \PHPCDI\API\Inject\SPI\BeanManager {
     }
 
     public function fireEvent($eventData, array $qualifiers) {
+        $eventDataObj = is_array($eventData)? $eventData[0] : $eventData;
+        
         foreach($this->resolveObserverMethods($eventData, $qualifiers) as $observerMethod) {
-            $observerMethod->notify($eventData);
+            $observerMethod->notify($eventDataObj);
         }
     }
 
     public function resolveObserverMethods($eventData, array $qualifiers) {
-        return $this->observerReslover->reslove(\get_class($eventData), $qualifiers);
+        $typeInfo = is_array($eventData)? array(\get_class($eventData[0]), $eventData[1]) : \get_class($eventData);
+        return $this->observerReslover->reslove($typeInfo, $qualifiers);
     }
     
     public function resolveDecorators($type, array $qualifiers) {

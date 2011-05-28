@@ -96,4 +96,16 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
 
         return $methods;
     }
+    
+    public function getFieldsWithAnnotation($annotationClass) {
+        $fields = array();
+        
+        foreach($this->fields as $field) {
+            if($field->isAnnotationPresent($annotationClass)) {
+                $fields[] = $field;
+            }
+        }
+        
+        return $fields;
+    }
 }

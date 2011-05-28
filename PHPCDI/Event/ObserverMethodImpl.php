@@ -23,6 +23,7 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
     private $qualifiers;
     private $type;
     private $reception;
+    private $typeFilter;
     
     /**
      * @var \PHPCDI\API\Inject\SPI\BeanManager
@@ -39,6 +40,14 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
         
         $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($param);
         $this->type = $param->getBaseType();
+        
+        if($param->isAnnotationPresent('PHPCDI\API\Inject\TypeFilter')) {
+            $this->typeFilter = $param->getAnnotation('PHPCDI\API\Inject\TypeFilter')->value;
+            
+            if(empty($this->typeFilter)) {
+                throw new \PHPCDI\API\DefinitionException('TypeFilter annotation must have an value in ' . $method->getBaseType() . '::' . $method->getPHPMember()->name);
+            }
+        }
         
         $observesAnnotation = $param->getAnnotation('PHPCDI\API\Inject\Observes');
         if($observesAnnotation == null) {
@@ -66,6 +75,10 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
 
     public function getObservedType() {
         return $this->type;
+    }
+    
+    public function getObservedTypeFilter() {
+        return $this->typeFilter;
     }
 
     public function getReception() {

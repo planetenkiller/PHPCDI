@@ -225,7 +225,7 @@ abstract class Annotations {
     public static function getReturnType(\ReflectionMethod $method) {
         $reader = self::reader();
         $annotation = $reader->getMethodAnnotation($method, 'PHPCDI\Util\PhpDoc\PhpDocReturn');
-        return $annotation != null? $annotation->type : null;
+        return $annotation != null? ReflectionUtil::resolveRelativeClassName($annotation->type, $method->getDeclaringClass()) : null;
     }
 
     public static function getPropertyType(\ReflectionProperty $property) {

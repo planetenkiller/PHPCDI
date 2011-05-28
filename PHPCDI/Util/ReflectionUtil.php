@@ -3,11 +3,13 @@
 namespace PHPCDI\Util;
 
 abstract class ReflectionUtil {
-    private static $PRIMITIVE_TYPES = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'mixed');
+    private static $PRIMITIVE_TYPES = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'mixed', 'object');
     private static $PRIMITIVE_TYPE_ALIASES = array('bool' => 'boolean',
                                                    'boolean' => 'bool',
                                                    'int' => 'integer',
-                                                   'integer' => 'int');
+                                                   'integer' => 'int',
+                                                   'mixed' => 'object',
+                                                   'object' => 'mixed');
 
 
     public static function isPrimitiveType($typeName) {
@@ -111,5 +113,13 @@ abstract class ReflectionUtil {
 	
         $name[0] = strtolower($name[0]);
         return $name;
+    }
+    
+    public static function resolveRelativeClassName($className, \ReflectionClass $classOfFile) {
+        if(!self::isPrimitiveType($className) && !class_exists($className) && !interface_exists($className)) {
+            return $classOfFile->getNamespaceName() . '\\' . $className;
+        } else {
+            return $className;
+        }
     }
 }

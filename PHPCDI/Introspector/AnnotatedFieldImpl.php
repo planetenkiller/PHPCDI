@@ -20,7 +20,8 @@ class AnnotatedFieldImpl implements \PHPCDI\API\Inject\SPI\AnnotatedField {
             $this->baseType = 'mixed';
             $this->allTypes = array('mixed');
         } else {
-            $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($this->baseType));
+            $this->baseType = \PHPCDI\Util\ReflectionUtil::resolveRelativeClassName($this->baseType, $property->getDeclaringClass());
+            $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames($this->baseType);
         }
     }
 

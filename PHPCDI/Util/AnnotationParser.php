@@ -79,15 +79,19 @@ class AnnotationParser extends \Doctrine\Common\Annotations\Parser {
 
                         return $this->newAnnotation('PHPCDI\API\Inject\P', array('value' => $annos, 'name' => $paramName));
                     } else {
-                        $this->match(Lexer::T_IDENTIFIER);
-                        $typeParts[] = $this->getLexer()->token['value'];
-                        while ($this->getLexer()->isNextToken(Lexer::T_NAMESPACE_SEPARATOR)) {
-                            $this->match(Lexer::T_NAMESPACE_SEPARATOR);
+                        $type = 'mixed';
+                        
+                        if($this->getLexer()->lookahead['type'] == Lexer::T_IDENTIFIER) {
                             $this->match(Lexer::T_IDENTIFIER);
                             $typeParts[] = $this->getLexer()->token['value'];
-                        }
+                            while ($this->getLexer()->isNextToken(Lexer::T_NAMESPACE_SEPARATOR)) {
+                                $this->match(Lexer::T_NAMESPACE_SEPARATOR);
+                                $this->match(Lexer::T_IDENTIFIER);
+                                $typeParts[] = $this->getLexer()->token['value'];
+                            }
 
-                        $type = implode('\\', $typeParts);
+                            $type = implode('\\', $typeParts);
+                        }
 
                         if($name['value'] == 'param') {
                             $this->match(Lexer::T_NONE);

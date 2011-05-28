@@ -35,6 +35,7 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
 
             if($paramAnnotation != null) {
                 $this->baseType = $paramAnnotation->type;
+                $this->baseType = \PHPCDI\Util\ReflectionUtil::resolveRelativeClassName($this->baseType, $parameter->getDeclaringClass());
                 $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames($this->baseType);
                 $this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'] = $paramAnnotation;
             } else {

@@ -239,6 +239,18 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         return $obj;
     }
     
+    public function getAnnotatedType() {
+        return $this->annotatedType;
+    }
+    
+    public function getInjectionTarget() {
+        return $this->injectionTarget;
+    }
+    
+    public function setInjectionTarget(\PHPCDI\API\Inject\SPI\InjectionTarget $injectionTarget) {
+        $this->injectionTarget = $injectionTarget;
+    }
+    
     public function __toString() {
         return "ManagedBean of class " . $this->className;
     }

@@ -42,8 +42,73 @@ class Configuration {
      * @return \PHPCDI\Container
      */
     public function buildContainer() {
+        // create bean manager graph
         $classBundleManager = new \SplObjectStorage();
         $rootManager = $this->buildManager($classBundleManager);
+        
+        // deploy extensions
+        foreach($this->deployment->getExtensions() as $extensionClassName) {
+            $classBundle = $this->deployment->getBundleOfClass($extensionClassName);
+            $beanManager = $classBundleManager[$classBundle];
+            
+            $bean = new \PHPCDI\Bean\Builtin\ExtensionBean($beanManager, new $extensionClassName());
+            $type = new \PHPCDI\Introspector\AnnotatedTypeImpl($extensionClassName);
+            $beanManager->addBean($bean);
+            $this->createObserver($bean, $type, $beanManager);
+        }
+        
+        // BeforeBeanDiscovery event (used by extensions)
+        $eventdata = new Event\BeforeBeanDiscoveryImpl();
+        $rootManager->fireEvent($eventdata, array(\PHPCDI\API\Inject\Any::newInstance()));
+        
+        // create beans
+        $this->buildBeans($classBundleManager);
+        
+        // AfterBeanDiscovery event
+        $eventdata = new Event\AfterBeanDiscoveryImpl();
+        $rootManager->fireEvent($eventdata, array(\PHPCDI\API\Inject\Any::newInstance()));
+        
+        if($eventdata->getErrors()) {
+            throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+        }
+        
+        foreach($eventdata->getBeans() as $bean) {
+            $beanClassName = $bean->getBeanClass();
+            $classBundle = $this->deployment->getBundleOfClass($beanClassName);
+            
+            if($classBundle == null) {
+                throw new \PHPCDI\API\DefinitionException('Bean of class ' . $beanClassName . ' has no class bundle (bean added via AfterBeanDiscovery event)');
+            }
+            
+            // process bean event
+            $eventdataSub = new Event\ProcessBeanImpl($bean, null);//TODO get annotated type somehow
+            $classBundleManager[$classBundle]->fireEvent(array($eventdataSub, $bean->getBeanClass()), array(\PHPCDI\API\Inject\Any::newInstance()));
+
+            if($eventdataSub->getErrors()) {
+                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdataSub->getErrors());
+            }
+            
+            if($bean instanceof \PHPCDI\API\Inject\SPI\Decorator) {
+                $classBundleManager[$classBundle]->addDecorator($bean);
+            } else {
+                $classBundleManager[$classBundle]->addBean($bean);
+            }
+        }
+        
+        foreach ($eventdata->getObservers() as $observer) {
+            $beanClassName = $bean->getBeanClass();
+            $classBundle = $this->deployment->getBundleOfClass($beanClassName);
+            
+            if($classBundle == null) {
+                throw new \PHPCDI\API\DefinitionException('Observer ' . $observer . ' has no class bundle (observer added via AfterBeanDiscovery event)');
+            }
+            
+            $classBundleManager[$classBundle]->addObserver($observer);
+        }
+        
+        foreach ($eventdata->getContexts() as $context) {
+            $rootManager->addContext($context);
+        }
 
         $container = new \PHPCDI\Container($this->deployment, $rootManager, $classBundleManager);
         
@@ -61,27 +126,6 @@ class Configuration {
         // create managers
         foreach($this->deployment->getClassBundles() as $classBundle) {
             $this->createManagerAndDeploy($classBundle, $rootmanager, $classBundleManager, new \SplObjectStorage());
-        }
-
-        // build beans and add them to the managers
-        foreach($classBundleManager as $classBundle) {
-            $manager = $classBundleManager[$classBundle];
-            foreach($classBundle->getClasses() as $class) {
-                $reflectionClass = new \ReflectionClass($class);
-                if(\PHPCDI\Util\ReflectionUtil::isManagedBean($reflectionClass)) {
-                    $type = new \PHPCDI\Introspector\AnnotatedTypeImpl($class);
-                    
-                    if($type->isAnnotationPresent('PHPCDI\API\Inject\Decorator')) {
-                        $decorator = new \PHPCDI\Bean\DecoratorImpl($class, $type, $manager);
-                        $manager->addDecorator($decorator);
-                    } else {
-                        $bean = new \PHPCDI\Bean\ManagedBean($class, $type, $manager);
-                        $manager->addBean($bean);
-                        $this->createProducer($bean, $type, $manager);
-                        $this->createObserver($bean, $type, $manager);
-                    }
-                }
-            }
         }
 
         return $rootmanager;
@@ -108,6 +152,63 @@ class Configuration {
 
         return $parent;
     }
+    
+    private function buildBeans(\SplObjectStorage $classBundleManager) {
+        // build beans and add them to the managers
+        foreach($classBundleManager as $classBundle) {
+            $manager = $classBundleManager[$classBundle];
+            foreach($classBundle->getClasses() as $class) {
+                $reflectionClass = new \ReflectionClass($class);
+               
+                    $type = new \PHPCDI\Introspector\AnnotatedTypeImpl($class);
+                    
+                    // ProcessAnnotatedType event (used by extensions)
+                    $eventdata = new Event\ProcessAnnotatedTypeImpl();
+                    $eventdata->setAnnotatedType($type);
+                    $manager->fireEvent(array($eventdata, $type->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                    $type = $eventdata->getAnnotatedType();
+                    
+                    if(!$eventdata->hasVeto() && \PHPCDI\Util\ReflectionUtil::isManagedBean($reflectionClass)) {
+                        if($type->isAnnotationPresent('PHPCDI\API\Inject\Decorator')) {
+                            $decorator = new \PHPCDI\Bean\DecoratorImpl($class, $type, $manager);
+                            
+                            // process managed bean
+                            $eventdata = new Event\ProcessBeanImpl($decorator, $decorator->getAnnotatedType());
+                            $manager->fireEvent(array($eventdata, $type->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+                            if($eventdata->getErrors()) {
+                                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+                            }
+                            
+                            $manager->addDecorator($decorator);
+                        } else {
+                            $bean = new \PHPCDI\Bean\ManagedBean($class, $type, $manager);
+                            
+                            // process injection target event
+                            $eventdata = new Event\ProcessInjectionTargetImpl($bean);
+                            $manager->fireEvent(array($eventdata, $type->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+                            if($eventdata->getErrors()) {
+                                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+                            }
+                            
+                            // process managed bean event
+                            $eventdata = new Event\ProcessManagedBeanImpl($bean);
+                            $manager->fireEvent(array($eventdata, $type->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+                            if($eventdata->getErrors()) {
+                                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+                            }
+                            
+                            
+                            $manager->addBean($bean);
+                            $this->createProducer($bean, $type, $manager);
+                            $this->createObserver($bean, $type, $manager);
+                        }
+                    }
+            }
+        }
+    }
 
     private function createProducer($declaringBean, \PHPCDI\Introspector\AnnotatedTypeImpl $class, BeanManager $manager) {
         $disposers = $class->getMethodsWithAnnotationOnFirstParameter('PHPCDI\API\Inject\Disposes');
@@ -128,8 +229,48 @@ class Configuration {
                 }
             }
             
+            $bean = new \PHPCDI\Bean\ProducerMethod($declaringBean, $method, $disposer, $manager);
             
-            $manager->addBean(new \PHPCDI\Bean\ProducerMethod($declaringBean, $method, $disposer, $manager));
+            // process producer event
+            $eventdata = new Event\ProcessProducerImpl($bean);
+            $manager->fireEvent(array($eventdata, $bean->getMember()->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+            if($eventdata->getErrors()) {
+                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+            }
+            
+            // process producer method
+            $eventdata = new Event\ProcessProducerMethodImpl($bean);
+            $manager->fireEvent(array($eventdata, $bean->getMember()->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+            if($eventdata->getErrors()) {
+                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+            }
+                            
+            $manager->addBean($bean);
+        }
+        
+        
+        foreach($class->getFieldsWithAnnotation('PHPCDI\API\Inject\Produces') as $field) {
+            $bean = new \PHPCDI\Bean\ProducerField($declaringBean, $field, $manager);
+            
+            // process producer event
+            $eventdata = new Event\ProcessProducerImpl($bean);
+            $manager->fireEvent(array($eventdata, $bean->getMember()->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+            if($eventdata->getErrors()) {
+                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+            }
+            
+            // process producer method
+            $eventdata = new Event\ProcessProducerFieldImpl($bean);
+            $manager->fireEvent(array($eventdata, $bean->getMember()->getBaseType()), array(\PHPCDI\API\Inject\Any::newInstance()));
+                            
+            if($eventdata->getErrors()) {
+                throw \PHPCDI\API\DefinitionException::fromExceptionList($eventdata->getErrors());
+            }
+                            
+            $manager->addBean($bean);
         }
     }
 
@@ -142,6 +283,7 @@ class Configuration {
     }
 
     private function addBuiltinBeansToManager(BeanManager $beanManager) {
+        $beanManager->addBean(new \PHPCDI\Bean\Builtin\BeanManagerBean($beanManager));
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\EventBean($beanManager));
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\InstanceBean($beanManager));
         $beanManager->addBean(new \PHPCDI\Bean\Builtin\InjectionPointBean($beanManager));

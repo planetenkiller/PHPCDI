@@ -21,8 +21,14 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
      * @var PHPCDI\API\Inject\SPI\AnnotatedMember
      */
     protected $member;
+    
+    /**
+     *
+     * @var \PHPCDI\API\Inject\SPI\Producer
+     */
+    protected $producer;
 
-    private $injectionpoints;
+    protected $injectionpoints;
     private $qualifiers;
     private $stereotypes;
     private $scope;
@@ -42,13 +48,24 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
         $this->stereotypes = \PHPCDI\Util\Annotations::getStereotypes($member);
         $this->scope = \PHPCDI\Util\Annotations::getScope($member);
     }
+    
+    
+    public function create($creationalContext) {
+        $obj = $this->producer->produce($creationalContext);
+        
+        if($this->getScope() instanceof \PHPCDI\API\Inject\Dependent) {
+            $creationalContext->release();
+        }
+        
+        return $obj;
+    }
 
     public function getBeanClass() {
         return $this->declaringBeanClassName;
     }
 
     public function getInjectionPoints() {
-        return $this->injectionpoints;
+        return $this->producer->getInjectionPoints();
     }
 
     public function getName() {
@@ -77,5 +94,25 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
 
     public function isNullable() {
         return !\PHPCDI\Util\ReflectionUtil::isPrimitiveType($this->member->getBaseType());
+    }
+    
+    public function setProducer(\PHPCDI\API\Inject\SPI\Producer $producer) {
+        $this->producer = $producer;
+    }
+    
+    public function getProducer() {
+        return $this->producer;
+    }
+    
+    public function getPhpCdiInjectionPoints() {
+        return $this->injectionpoints;
+    }
+    
+    public function getMember() {
+        return $this->member;
+    }
+    
+    public function getDeclaringBean() {
+        return $this->declaringBean;
     }
 }

@@ -15,23 +15,14 @@ class ProducerField extends AbstractProducer {
     public function __construct(Bean $declaringBean, AnnotatedField $field, BeanManager $beanManager) {
         parent::__construct($declaringBean, $field, array());
         $this->beanManager = $beanManager;
+        $this->setProducer(new \PHPCDI\Injection\FieldProducer($this));
     }
 
-    public function create($creationalContext) {
-        $declaringBeanObj = $this->beanManager->getRefernce($this->declaringBean, $this->member->getBaseType(), $creationalContext);
-        $reflectionProperty = $this->member->getPHPMember();
-        $reflectionProperty->setAccessible(true);
-
-        $obj = $reflectionMethod->getValue($declaringBeanObj);
-
-        if($this->getScope()instanceof \PHPCDI\API\Inject\Dependent) {
-            $creationalContext->release();
-        }
-
-        return $obj;
+    public function getBeanManager() {
+        return $this->beanManager;
     }
 
     public function destroy($instance, $creationalContext) {
-        //todo: invoke disposer method
+        $this->producer->dispose($instance);
     }
 }
