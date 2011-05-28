@@ -3,7 +3,7 @@
 namespace PHPCDI\Example\Doctrine\Entities;
 
 /**
- * @Entity
+ * @Entity(repositoryClass="PHPCDI\Example\Doctrine\Entities\UserRepository")
  * @Table(name="users")
  */
 class User {

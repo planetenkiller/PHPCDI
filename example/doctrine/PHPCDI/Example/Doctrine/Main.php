@@ -5,8 +5,7 @@ namespace PHPCDI\Example\Doctrine;
 class Main {
     /**
      * @Inject 
-     * @PHPCDI\Extensions\Doctrine2\Annotations\EntityRepository("PHPCDI\Example\Doctrine\Entities\User")
-     * @var Doctrine\ORM\EntityRepository
+     * @var PHPCDI\Example\Doctrine\Entities\UserRepository
      */
     private $userRepository;
     

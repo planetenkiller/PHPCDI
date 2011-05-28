@@ -27,6 +27,7 @@ $doctrineBundle->addClassBundle($classpathBundle); // allow $doctrineBundle to a
 $deployment = new \PHPCDI\Bootstrap\Deployment();
 $deployment->addClassBundle($doctrineBundle);
 $deployment->addClassBundle($classpathBundle);
+$deployment->markAsExtension('PHPCDI\Extensions\Doctrine2\DoctrineExtension');
 
 
 $configuration = new PHPCDI\Bootstrap\Configuration($deployment);
