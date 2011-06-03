@@ -57,12 +57,12 @@ class AnnotationParserTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($annos);
         $this->assertEquals(2, \count($annos));
-        $this->assertTrue(isset ($annos['PHPCDI\API\Inject\P']));
-        $this->assertEquals('user', $annos['PHPCDI\API\Inject\P']->name);
-        $this->assertTrue(\is_array($annos['PHPCDI\API\Inject\P']->value));
-        $this->assertEquals(2, \count($annos['PHPCDI\API\Inject\P']->value));
-        $this->assertInstanceOf('PHPCDI\API\Inject\Inject', $annos['PHPCDI\API\Inject\P']->value[0]);
-        $this->assertInstanceOf('PHPCDI\API\Inject\Any', $annos['PHPCDI\API\Inject\P']->value[1]);
+        $this->assertTrue(isset ($annos[\PHPCDI\API\Inject\P::className()]));
+        $this->assertEquals('user', $annos[\PHPCDI\API\Inject\P::className()]->name);
+        $this->assertTrue(\is_array($annos[\PHPCDI\API\Inject\P::className()]->value));
+        $this->assertEquals(2, \count($annos[\PHPCDI\API\Inject\P::className()]->value));
+        $this->assertInstanceOf(\PHPCDI\API\Inject\Inject::className(), $annos[\PHPCDI\API\Inject\P::className()]->value[0]);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\Any::className(), $annos[\PHPCDI\API\Inject\P::className()]->value[1]);
     }
 }
 

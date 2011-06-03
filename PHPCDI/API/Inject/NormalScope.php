@@ -5,7 +5,7 @@ namespace PHPCDI\API\Inject;
 /**
  * NormalScope Annotation.
  */
-class NormalScope extends \Doctrine\Common\Annotations\Annotation {
+class NormalScope extends \PHPCDI\API\Annotation {
     /**
      * @var boolean
      */

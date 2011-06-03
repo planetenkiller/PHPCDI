@@ -5,5 +5,5 @@ namespace PHPCDI\API\Inject;
 /**
  * Decorator annotation.
  */
-class Decorator extends \Doctrine\Common\Annotations\Annotation {
+class Decorator extends \PHPCDI\API\Annotation {
 }

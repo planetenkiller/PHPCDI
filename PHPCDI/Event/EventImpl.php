@@ -30,7 +30,7 @@ class EventImpl implements Event {
         $this->injectionPoint = $ij;
         $this->beanManager = $beanManager;
         
-        $eventAnnotation = $ij->getAnnotated()->getAnnotation('PHPCDI\API\Inject\Event');
+        $eventAnnotation = $ij->getAnnotated()->getAnnotation(\PHPCDI\API\Inject\Event::className());
         if($eventAnnotation == null || empty($eventAnnotation->value)) {
             throw new \PHPCDI\API\Inject\DefinitionException('event injection point [' . $ij . '] must declare its event data type with a @Event annotation');
         }

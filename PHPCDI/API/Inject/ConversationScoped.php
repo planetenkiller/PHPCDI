@@ -7,6 +7,6 @@ namespace PHPCDI\API\Inject;
  *
  * @NormalScope(passivating=true)
  */
-class ConversationScoped extends \Doctrine\Common\Annotations\Annotation {
+class ConversationScoped extends \PHPCDI\API\Annotation {
 }
 

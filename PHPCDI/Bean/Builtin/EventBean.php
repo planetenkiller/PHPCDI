@@ -46,7 +46,7 @@ class EventBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getScope() {
-        return 'PHPCDI\API\Inject\Dependent';
+        return \PHPCDI\API\Inject\Dependent::className();
     }
 
     public function getStereotypes() {

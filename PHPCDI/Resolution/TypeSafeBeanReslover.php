@@ -19,7 +19,7 @@ class TypeSafeBeanReslover implements Resolver {
     public function reslove($beanType, $qualifiers) {
         if($beanType == 'PHPCDI\API\Instance\Instance' 
                 || $beanType == 'PHPCDI\API\Event\Event') {
-            $qualifiers = array('PHPCDI\API\Inject\Any');
+            $qualifiers = array(\PHPCDI\API\Inject\Any::className());
         }
         
         $beans = array();

@@ -47,21 +47,21 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
             $this->allTypes = array('mixed');
         }
         
-        if(isset($this->annotations['PHPCDI\API\Inject\P'])) {
+        if(isset($this->annotations[\PHPCDI\API\Inject\P::className()])) {
             // extract annotations for this parameter
             $paramAnnotation = null;
-            if(\is_array($this->annotations['PHPCDI\API\Inject\P'])) {
-                foreach($this->annotations['PHPCDI\API\Inject\P'] as $param) {
+            if(\is_array($this->annotations[\PHPCDI\API\Inject\P::className()])) {
+                foreach($this->annotations[\PHPCDI\API\Inject\P::className()] as $param) {
                     if($param->name == $parameter->name) {
                         $paramAnnotation = $param;
                     }
                 }
-            } else if($this->annotations['PHPCDI\API\Inject\P']->name == $parameter->name) {
-                $paramAnnotation = $this->annotations['PHPCDI\API\Inject\P'];
+            } else if($this->annotations[\PHPCDI\API\Inject\P::className()]->name == $parameter->name) {
+                $paramAnnotation = $this->annotations[\PHPCDI\API\Inject\P::className()];
             }
             
             // remove all annotaton holder annotations
-            unset($this->annotations['PHPCDI\API\Inject\P']);
+            unset($this->annotations[\PHPCDI\API\Inject\P::className()]);
             
             if($paramAnnotation != null) {
                 // add parameter annotations as first level annotations

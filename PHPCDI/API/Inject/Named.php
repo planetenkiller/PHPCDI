@@ -2,6 +2,6 @@
 
 namespace PHPCDI\API\Inject;
 
-class Named extends \Doctrine\Common\Annotations\Annotation {
+class Named extends \PHPCDI\API\Annotation {
 }
 

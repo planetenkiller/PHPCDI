@@ -7,6 +7,6 @@ namespace PHPCDI\API\Inject;
  *
  * @NormalScope(passivating=true)
  */
-class SessionScoped extends \Doctrine\Common\Annotations\Annotation {
+class SessionScoped extends \PHPCDI\API\Annotation {
 }
 

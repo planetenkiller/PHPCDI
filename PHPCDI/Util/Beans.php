@@ -34,7 +34,7 @@ abstract class Beans {
     {
         if($constructor == null) {
             return array();
-        } else if($constructor->isAnnotationPresent('PHPCDI\API\Inject\Inject')) {
+        } else if($constructor->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) {
             $injectionPoints = array();
             foreach($constructor->getParameters() as $parameter) {
                 $injectionPoints[] = new ParameterInjectionPoint($declaringBean, $parameter);
@@ -55,7 +55,7 @@ abstract class Beans {
         //TODO check superclass too
         foreach($class->getMethods() as $method) {
             if(!$method->isStatic()
-                && $method->isAnnotationPresent('PHPCDI\API\Inject\Inject')) { //TODO: not Produces,Disposes,Observes
+                && $method->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) { //TODO: not Produces,Disposes,Observes
                 $initializerMethodsList[] = $method;
             }
         }
@@ -68,7 +68,7 @@ abstract class Beans {
 
         //TODO check superclass too
         foreach($class->getFields() as $field) {
-            if(!$field->isStatic() && $field->isAnnotationPresent('PHPCDI\API\Inject\Inject')) { //TODO: not producer
+            if(!$field->isStatic() && $field->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) { //TODO: not producer
                 $fields[] = new \PHPCDI\Injection\FieldInjectionPoint($declaringBean, $field);
             }
         }
@@ -97,7 +97,7 @@ abstract class Beans {
 
         //TODO check superclass too
         foreach($class->getMethods() as $method) {
-            if($method->isAnnotationPresent('PHPCDI\API\Inject\PostConstruct')) {
+            if($method->isAnnotationPresent(\PHPCDI\API\Inject\PostConstruct::className())) {
                 $methods[] = $method;
             }
         }

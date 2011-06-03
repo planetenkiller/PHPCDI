@@ -5,6 +5,6 @@ namespace PHPCDI\API\Inject;
 /**
  * PostConstruct Annotation.
  */
-class PostConstruct extends \Doctrine\Common\Annotations\Annotation {
+class PostConstruct extends \PHPCDI\API\Annotation {
 }
 

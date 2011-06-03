@@ -23,7 +23,7 @@ class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
         $this->assertEquals(1, count($this->getBeans('RedSnapper')));
         
         $list = $this->getBeans('RedSnapper');
-        $this->assertEquals('PHPCDI\API\Inject\Dependent', $list[0]->getScope());
+        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $list[0]->getScope());
     }
     
     public function testIsNullable() {
@@ -76,7 +76,7 @@ class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
     
     public function testMultipleStereotypes() {
         $bean = $this->getBean('ComplicatedTuna');
-        $this->assertEquals("PHPCDI\API\Inject\Dependent", $bean->getScope());
+        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $bean->getScope());
         $this->assertEquals("complicatedTuna", $bean->getName());
     }
     

@@ -12,8 +12,8 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     private $reflectionClass;
     private $annotations;
     private $constructor;
-    private $fields;
-    private $methods;
+    private $fields = null;
+    private $methods = null;
 
     public function __construct($className) {
         $this->className = $className;
@@ -24,12 +24,16 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
         if($this->reflectionClass->getConstructor() != null) {
             $this->constructor = new AnnotatedConstructorImpl($this, $this->reflectionClass->getConstructor());
         }
-
+    }
+    
+    private function initFields() {
         $this->fields = array();
         foreach(\PHPCDI\Util\ReflectionUtil::getAllFields($this->reflectionClass) as $field) {
             $this->fields[] = new AnnotatedFieldImpl($this, $field);
         }
-
+    }
+    
+    private function initMethods() {
         $this->methods = array();
         foreach(\PHPCDI\Util\ReflectionUtil::getAllMethods($this->reflectionClass) as $method) {
             $this->methods[] = new AnnotatedMethodImpl($this, $method);
@@ -57,10 +61,18 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     }
 
     public function getFields() {
+        if($this->fields == null) {
+            $this->initFields();
+        }
+        
         return $this->fields;
     }
 
     public function getMethods() {
+        if($this->methods == null) {
+            $this->initMethods();
+        }
+        
         return $this->methods;
     }
 
@@ -73,6 +85,10 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     }
 
     public function getMethodsWithAnnotation($annotationClass) {
+        if($this->methods == null) {
+            $this->initMethods();
+        }
+        
         $methods = array();
 
         foreach($this->methods as $method) {
@@ -85,6 +101,10 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     }
     
     public function getMethodsWithAnnotationOnFirstParameter($annotationClass) {
+        if($this->methods == null) {
+            $this->initMethods();
+        }
+        
         $methods = array();
 
         foreach($this->methods as $method) {
@@ -98,6 +118,10 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     }
     
     public function getFieldsWithAnnotation($annotationClass) {
+        if($this->fields == null) {
+            $this->initFields();
+        }
+        
         $fields = array();
         
         foreach($this->fields as $field) {

@@ -30,7 +30,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $qualifiers[0]);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testGetQualifiersOnClass() {
@@ -44,7 +44,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $qualifiers[0]);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testGetQualifiersOnField() {
@@ -58,7 +58,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $qualifiers[0]);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testIsQualifier() {
@@ -88,13 +88,13 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($stereotypes);
         $this->assertEquals(2, count($stereotypes));
-        $this->assertInstanceOf('PHPCDI\API\Inject\DefaultObj', $stereotypes['PHPCDI\API\Inject\DefaultObj']);
-        $this->assertInstanceOf('PHPCDI\API\Inject\Any', $stereotypes['PHPCDI\API\Inject\Any']);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $stereotypes[\PHPCDI\API\Inject\DefaultObj::className()]);
+        $this->assertInstanceOf(\PHPCDI\API\Inject\Any::className(), $stereotypes[\PHPCDI\API\Inject\Any::className()]);
     }
 
     public function testIsScope() {
-        $this->assertTrue(Annotations::isScope(new \ReflectionClass('PHPCDI\API\Inject\ApplicationScoped')));
-        $this->assertTrue(Annotations::isScope(new \ReflectionClass('PHPCDI\API\Inject\Dependent')));
+        $this->assertTrue(Annotations::isScope(new \ReflectionClass(\PHPCDI\API\Inject\ApplicationScoped::className())));
+        $this->assertTrue(Annotations::isScope(new \ReflectionClass(\PHPCDI\API\Inject\Dependent::className())));
     }
 
     public function testIsScopeNonScopeAnnotations() {
@@ -111,7 +111,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
         $scope = Annotations::getScope($class);
 
         $this->assertNotNull($scope);
-        $this->assertEquals('PHPCDI\API\Inject\ApplicationScoped', $scope);
+        $this->assertEquals(\PHPCDI\API\Inject\ApplicationScoped::className(), $scope);
     }
 
     public function testGetScopedDefaultScope() {
@@ -124,7 +124,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
         $scope = Annotations::getScope($class);
 
         $this->assertNotNull($scope);
-        $this->assertEquals('PHPCDI\API\Inject\Dependent', $scope);
+        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $scope);
     }
 }
 

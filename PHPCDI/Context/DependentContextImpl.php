@@ -24,7 +24,7 @@ class DependentContextImpl implements Context {
     }
 
     public function getScope() {
-        return 'PHPCDI\API\Inject\Dependent';
+        return \PHPCDI\API\Inject\Dependent::className();
     }
 
     public function isActive() {

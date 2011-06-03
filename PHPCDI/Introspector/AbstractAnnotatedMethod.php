@@ -10,7 +10,7 @@ abstract class AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\Annotat
     private $allTypes;
     private $class;
     private $reflectionMethod;
-    private $parameters;
+    private $parameters = null;
 
     public function __construct($annotations, $baseType, $allTypes, \PHPCDI\API\Inject\SPI\AnnotatedType $class, \ReflectionMethod $method) {
         $this->annotations = $annotations;
@@ -18,13 +18,14 @@ abstract class AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\Annotat
         $this->allTypes = $allTypes;
         $this->class = $class;
         $this->reflectionMethod = $method;
-
+    }
+    
+    private function initParameters() {
         $this->parameters = array();
-        foreach($method->getParameters() as $parameter) {
+        foreach($this->reflectionMethod->getParameters() as $parameter) {
             $this->parameters[] = new AnnotatedParameterImpl($this, $parameter);
         }
     }
-
 
     public function getAnnotation($annotationType) {
          return isset($this->annotations[$annotationType])? $this->annotations[$annotationType] : null;
@@ -51,6 +52,10 @@ abstract class AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\Annotat
     }
 
     public function getParameters() {
+        if($this->parameters == null) {
+            $this->initParameters();
+        }
+        
         return $this->parameters;
     }
 

@@ -92,7 +92,7 @@ abstract class ReflectionUtil {
         $isAbstract = $reflectionClass->isAbstract() || $reflectionClass->isInterface();
         $isAnnotation = \in_array('Doctrine\Common\Annotations\Annotation', \class_parents($reflectionClass->name));
         $hasAtInject = $reflectionClass->getConstructor() != null
-                           ? Annotations::reader()->getMethodAnnotation($reflectionClass->getConstructor(), 'PHPCDI\API\Inject\Inject') != null
+                           ? Annotations::reader()->getMethodAnnotation($reflectionClass->getConstructor(), \PHPCDI\API\Inject\Inject::className()) != null
                            : false;
         $hasParameter = $reflectionClass->getConstructor() != null
                             ? $reflectionClass->getConstructor()->getNumberOfParameters() > 0

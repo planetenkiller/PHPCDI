@@ -39,7 +39,7 @@ class BeanManagerBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getScope() {
-        return 'PHPCDI\API\Inject\ApplicationScoped';
+        return \PHPCDI\API\Inject\ApplicationScoped::className();
     }
 
     public function getStereotypes() {

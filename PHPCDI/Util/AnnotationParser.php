@@ -77,7 +77,7 @@ class AnnotationParser extends \Doctrine\Common\Annotations\Parser {
 
                         $this->isNestedAnnotation = false;
 
-                        return $this->newAnnotation('PHPCDI\API\Inject\P', array('value' => $annos, 'name' => $paramName));
+                        return $this->newAnnotation(\PHPCDI\API\Inject\P::className(), array('value' => $annos, 'name' => $paramName));
                     } else {
                         $type = 'mixed';
                         

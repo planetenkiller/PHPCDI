@@ -56,7 +56,7 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
 
     public function isDelegate() {
-        return $this->paramter->isAnnotationPresent('PHPCDI\API\Inject\Delegate');
+        return $this->paramter->isAnnotationPresent(\PHPCDI\API\Inject\Delegate::className());
     }
 
     public function isTransient() {

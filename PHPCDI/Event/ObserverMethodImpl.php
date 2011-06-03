@@ -41,15 +41,15 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
         $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($param);
         $this->type = $param->getBaseType();
         
-        if($param->isAnnotationPresent('PHPCDI\API\Inject\TypeFilter')) {
-            $this->typeFilter = $param->getAnnotation('PHPCDI\API\Inject\TypeFilter')->value;
+        if($param->isAnnotationPresent(\PHPCDI\API\Inject\TypeFilter::className())) {
+            $this->typeFilter = $param->getAnnotation(\PHPCDI\API\Inject\TypeFilter::className())->value;
             
             if(empty($this->typeFilter)) {
                 throw new \PHPCDI\API\DefinitionException('TypeFilter annotation must have an value in ' . $method->getBaseType() . '::' . $method->getPHPMember()->name);
             }
         }
         
-        $observesAnnotation = $param->getAnnotation('PHPCDI\API\Inject\Observes');
+        $observesAnnotation = $param->getAnnotation(\PHPCDI\API\Inject\Observes::className());
         if($observesAnnotation == null) {
             throw new \PHPCDI\API\Inject\DefinitionException('First parameter of an observer method must have the @Observes annotation: [' . $method . ']');
         }

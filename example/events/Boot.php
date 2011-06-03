@@ -20,7 +20,7 @@ $container = $configuration->buildContainer();
 $mng = $container->getManager($classBundle);
 
 
-$beans = $mng->getBeans('PHPCDI\Example\Events\UserDao', array('PHPCDI\API\Inject\DefaultObj', 'PHPCDI\API\Inject\Any'));
+$beans = $mng->getBeans('PHPCDI\Example\Events\UserDao', array(PHPCDI\API\Inject\DefaultObj::className(), PHPCDI\API\Inject\Any::className()));
 $bean = $mng->resolve($beans);
 $ctx = $mng->createCreationalContext($bean);
 $obj = $mng->getRefernce($bean, 'PHPCDI\Example\Events\UserDao', $ctx);

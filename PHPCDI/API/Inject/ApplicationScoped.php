@@ -7,6 +7,6 @@ namespace PHPCDI\API\Inject;
  *
  * @NormalScope
  */
-class ApplicationScoped extends \Doctrine\Common\Annotations\Annotation {
+class ApplicationScoped extends \PHPCDI\API\Annotation {
 }
 

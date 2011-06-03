@@ -7,7 +7,7 @@ namespace PHPCDI\API\Inject;
  *
  *
  */
-class P extends \Doctrine\Common\Annotations\Annotation {
+class P extends \PHPCDI\API\Annotation {
     /**
      * Name of the paramter
      * @var String

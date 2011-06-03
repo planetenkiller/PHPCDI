@@ -7,6 +7,6 @@ namespace PHPCDI\API\Inject;
  *
  * @Scope
  */
-class Dependent extends \Doctrine\Common\Annotations\Annotation {
+class Dependent extends \PHPCDI\API\Annotation {
 }
 

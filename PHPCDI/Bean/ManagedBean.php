@@ -62,11 +62,11 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($annotatedType);
         
         if(count($this->qualifiers) == 0 || (count($this->qualifiers) == 1 
-                && \PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, 'PHPCDI\API\Inject\Named'))) {
+                && \PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, \PHPCDI\API\Inject\Named::className()))) {
             $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
         }
         
-        if(!\PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, 'PHPCDI\API\Inject\Any')) {
+        if(!\PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, \PHPCDI\API\Inject\Any::className())) {
             $this->qualifiers[] = new \PHPCDI\API\Inject\Any(array());
         }
         
@@ -99,20 +99,20 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         // name
         $this->name = null;
         $useDefaultName = false;
-        if($this->annotatedType->isAnnotationPresent('PHPCDI\API\Inject\Named')) {
-            $namedAnnotation = $this->annotatedType->getAnnotation('PHPCDI\API\Inject\Named');
+        if($this->annotatedType->isAnnotationPresent(\PHPCDI\API\Inject\Named::className())) {
+            $namedAnnotation = $this->annotatedType->getAnnotation(\PHPCDI\API\Inject\Named::className());
             
             if(empty($namedAnnotation->value)) {
                 $useDefaultName = true;
             } else {
                 $this->name = $namedAnnotation->value;
             }
-        } else if(isset($this->stereotypes['PHPCDI\API\Inject\Named']) && 
-                !empty($this->stereotypes['PHPCDI\API\Inject\Named']->value)) {
+        } else if(isset($this->stereotypes[\PHPCDI\API\Inject\Named::className()]) && 
+                !empty($this->stereotypes[\PHPCDI\API\Inject\Named::className()]->value)) {
             throw new \PHPCDI\API\DefinitionException('Stereotype contains @Named annotation with a value! Stereotype used by managed bean: ' . $className);
         }
             
-        if($useDefaultName || isset($this->stereotypes['PHPCDI\API\Inject\Named'])) {
+        if($useDefaultName || isset($this->stereotypes[\PHPCDI\API\Inject\Named::className()])) {
             $startClass = strrpos($this->className, '\\');
 
             if($startClass !== false) {

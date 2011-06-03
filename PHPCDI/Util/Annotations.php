@@ -70,7 +70,7 @@ abstract class Annotations {
 
     public static function isQualifier(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $annotation = $reader->getClassAnnotation($annotationClass, 'PHPCDI\API\Inject\Qualifier');
+        $annotation = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\Qualifier::className());
         return $annotation != null;
     }
 
@@ -91,7 +91,7 @@ abstract class Annotations {
 
     public static function isStereotype(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $annotation = $reader->getClassAnnotation($annotationClass, 'PHPCDI\API\Inject\Stereotype');
+        $annotation = $reader->getClassAnnotation($annotationClass, Stereotype::className());
         return $annotation != null;
     }
 
@@ -155,8 +155,8 @@ abstract class Annotations {
 
     public static function isScope(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $scope = $reader->getClassAnnotation($annotationClass, 'PHPCDI\API\Inject\Scope');
-        $normalScope = $reader->getClassAnnotation($annotationClass, 'PHPCDI\API\Inject\NormalScope');
+        $scope = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\Scope::className());
+        $normalScope = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\NormalScope::className());
         return $scope != null || $normalScope != null;
     }
 

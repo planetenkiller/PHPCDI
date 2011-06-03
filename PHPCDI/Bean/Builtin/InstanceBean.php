@@ -21,7 +21,7 @@ class InstanceBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
         if($ij == null) {
             return null;
         } else {
-            $annotation = $ij->getAnnotated()->getAnnotation('PHPCDI\API\Inject\Instance');
+            $annotation = $ij->getAnnotated()->getAnnotation(\PHPCDI\API\Inject\Instance::className());
             if($annotation == null || empty($annotation->value)) {
                 throw new \PHPCDI\API\Inject\DefinitionException('Instance injection point [' . $ij . '] must declare its Instance data type with a @Instance annotation');
             }
@@ -51,7 +51,7 @@ class InstanceBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getScope() {
-        return 'PHPCDI\API\Inject\Dependent';
+        return \PHPCDI\API\Inject\Dependent::className();
     }
 
     public function getStereotypes() {

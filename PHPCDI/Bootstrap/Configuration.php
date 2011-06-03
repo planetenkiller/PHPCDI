@@ -169,7 +169,7 @@ class Configuration {
                     $type = $eventdata->getAnnotatedType();
                     
                     if(!$eventdata->hasVeto() && \PHPCDI\Util\ReflectionUtil::isManagedBean($reflectionClass)) {
-                        if($type->isAnnotationPresent('PHPCDI\API\Inject\Decorator')) {
+                        if($type->isAnnotationPresent(\PHPCDI\API\Inject\Decorator::className())) {
                             $decorator = new \PHPCDI\Bean\DecoratorImpl($class, $type, $manager);
                             
                             // process managed bean
@@ -211,9 +211,9 @@ class Configuration {
     }
 
     private function createProducer($declaringBean, \PHPCDI\Introspector\AnnotatedTypeImpl $class, BeanManager $manager) {
-        $disposers = $class->getMethodsWithAnnotationOnFirstParameter('PHPCDI\API\Inject\Disposes');
+        $disposers = $class->getMethodsWithAnnotationOnFirstParameter(\PHPCDI\API\Inject\Disposes::className());
         
-        foreach($class->getMethodsWithAnnotation('PHPCDI\API\Inject\Produces') as $method) {
+        foreach($class->getMethodsWithAnnotation(\PHPCDI\API\Inject\Produces::className()) as $method) {
             $disposer = null;
             
             foreach($disposers as $disposerMethod) {
@@ -251,7 +251,7 @@ class Configuration {
         }
         
         
-        foreach($class->getFieldsWithAnnotation('PHPCDI\API\Inject\Produces') as $field) {
+        foreach($class->getFieldsWithAnnotation(\PHPCDI\API\Inject\Produces::className()) as $field) {
             $bean = new \PHPCDI\Bean\ProducerField($declaringBean, $field, $manager);
             
             // process producer event
@@ -275,7 +275,7 @@ class Configuration {
     }
 
     private function createObserver($declaringBean, \PHPCDI\Introspector\AnnotatedTypeImpl $class, BeanManager $manager) {
-        $observers = $class->getMethodsWithAnnotationOnFirstParameter('PHPCDI\API\Inject\Observes');
+        $observers = $class->getMethodsWithAnnotationOnFirstParameter(\PHPCDI\API\Inject\Observes::className());
 
         foreach($observers as $observer) {
             $manager->addObserver(new \PHPCDI\Event\ObserverMethodImpl($declaringBean, $observer, $manager));
