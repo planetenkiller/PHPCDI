@@ -7,7 +7,7 @@ class ObtainsInstanceBean {
      * @Inject @PHPCDI\TCK\Lookup\Dynamic\PayBy("CHEQUE")
      * @Instance("PHPCDI\TCK\Lookup\Dynamic\AsynchronousPaymentProcessor")
      * 
-     * @var PHPCDI\API\Instance\Instance
+     * @var PHPCDI\API\Instance
      */
     private $paymentProcessor;
     
@@ -15,7 +15,7 @@ class ObtainsInstanceBean {
      * @Inject @Any
      * @Instance("PHPCDI\TCK\Lookup\Dynamic\PaymentProcessor")
      * 
-     * @var PHPCDI\API\Instance\Instance
+     * @var PHPCDI\API\Instance
      */
     private $anyPaymentProcessor;
     

@@ -2,19 +2,21 @@
 
 namespace PHPCDI\API\Event;
 
+use PHPCDI\SPI\InjectionTarget;
+
 interface ProcessInjectionTarget {
     /**
-     * @return \PHPCDI\API\Inject\SPI\AnnotatedType
+     * @return \PHPCDI\SPI\AnnotatedType
      */
     public function getAnnotatedType();
     
     /**
-     * @return \PHPCDI\API\Inject\SPI\InjectionTarget
+     * @return \PHPCDI\SPI\InjectionTarget
      */
     public function getInjectionTarget();
     
     
-    public function setInjectionTarget(\PHPCDI\API\Inject\SPI\InjectionTarget $injectionTarget);
+    public function setInjectionTarget(InjectionTarget $injectionTarget);
     
     
     public function addDefinitionError(\Exception $e);

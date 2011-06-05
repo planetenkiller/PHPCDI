@@ -4,12 +4,12 @@ namespace PHPCDI\API\Event;
 
 interface ProcessBean {
     /**
-     * @return \PHPCDI\API\Inject\SPI\Annotated
+     * @return \PHPCDI\SPI\Annotated
      */
     public function getAnnotated();
     
     /**
-     * @return \PHPCDI\API\Inject\SPI\Bean
+     * @return \PHPCDI\SPI\Bean
      */
     public function getBean();
     

@@ -4,12 +4,12 @@ namespace PHPCDI\API\Event;
 
 interface ProcessProducerMethod extends ProcessBean {
     /**
-     * @return \PHPCDI\API\Inject\SPI\AnnotatedMethod
+     * @return \PHPCDI\SPI\AnnotatedMethod
      */
     public function getAnnotatedProducerMethod();
     
     /**
-     * @return \PHPCDI\API\Inject\SPI\AnnotatedParameter
+     * @return \PHPCDI\SPI\AnnotatedParameter
      */
     public function getAnnotatedDisposedParameter();
 

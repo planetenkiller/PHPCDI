@@ -2,7 +2,11 @@
 
 namespace PHPCDI\Introspector;
 
-class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
+
+class AnnotatedTypeImpl implements AnnotatedType {
 
     private $className;
 
@@ -19,7 +23,7 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
         $this->className = $className;
         $this->reflectionClass = new \ReflectionClass($className);
 
-        $this->annotations = \PHPCDI\Util\Annotations::reader()->getClassAnnotations($this->reflectionClass);
+        $this->annotations = AnnotationUtil::reader()->getClassAnnotations($this->reflectionClass);
 
         if($this->reflectionClass->getConstructor() != null) {
             $this->constructor = new AnnotatedConstructorImpl($this, $this->reflectionClass->getConstructor());
@@ -28,14 +32,14 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     
     private function initFields() {
         $this->fields = array();
-        foreach(\PHPCDI\Util\ReflectionUtil::getAllFields($this->reflectionClass) as $field) {
+        foreach(ReflectionUtil::getAllFields($this->reflectionClass) as $field) {
             $this->fields[] = new AnnotatedFieldImpl($this, $field);
         }
     }
     
     private function initMethods() {
         $this->methods = array();
-        foreach(\PHPCDI\Util\ReflectionUtil::getAllMethods($this->reflectionClass) as $method) {
+        foreach(ReflectionUtil::getAllMethods($this->reflectionClass) as $method) {
             $this->methods[] = new AnnotatedMethodImpl($this, $method);
         }
     }
@@ -81,7 +85,7 @@ class AnnotatedTypeImpl implements \PHPCDI\API\Inject\SPI\AnnotatedType {
     }
 
     public function getTypeClosure() {
-        return \PHPCDI\Util\ReflectionUtil::getClassNames($this->reflectionClass);
+        return ReflectionUtil::getClassNames($this->reflectionClass);
     }
 
     public function getMethodsWithAnnotation($annotationClass) {

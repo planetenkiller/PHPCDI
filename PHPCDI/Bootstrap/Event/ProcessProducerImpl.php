@@ -2,11 +2,15 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessProducerImpl implements \PHPCDI\API\Event\ProcessProducer {
+use PHPCDI\API\Event\ProcessProducer;
+use PHPCDI\Bean\AbstractProducer;
+use PHPCDI\SPI\Producer;
+
+class ProcessProducerImpl implements ProcessProducer {
     private $erros = array();
     private $bean;
     
-    public function __construct(\PHPCDI\Bean\AbstractProducer $bean) {
+    public function __construct(AbstractProducer $bean) {
         $this->bean = $bean;
     }
     
@@ -22,7 +26,7 @@ class ProcessProducerImpl implements \PHPCDI\API\Event\ProcessProducer {
         return $this->bean->getProducer();
     }
 
-    public function setProducer(\PHPCDI\API\Inject\SPI\Producer $producer) {
+    public function setProducer(Producer $producer) {
         $this->bean->setProducer($producer);
     }
     

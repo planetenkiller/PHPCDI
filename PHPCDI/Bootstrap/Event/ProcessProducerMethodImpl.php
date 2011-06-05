@@ -2,11 +2,14 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessProducerMethodImpl implements \PHPCDI\API\Event\ProcessProducerMethod {
+use PHPCDI\API\Event\ProcessProducerMethod;
+use PHPCDI\Bean\ProducerMethod;
+
+class ProcessProducerMethodImpl implements ProcessProducerMethod {
     private $erros = array();
     private $bean;
     
-    public function __construct(\PHPCDI\Bean\ProducerMethod $bean) {
+    public function __construct(ProducerMethod $bean) {
         $this->bean = $bean;
     }
     

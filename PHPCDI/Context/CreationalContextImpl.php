@@ -2,13 +2,16 @@
 
 namespace PHPCDI\Context;
 
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\SPI\Context\Contextual;
+
 /**
  * CreationalContext implementation
  */
-class CreationalContextImpl implements \PHPCDI\API\Context\SPI\CreationalContext {
+class CreationalContextImpl implements CreationalContext {
 
     /**
-     * @var \PHPCDI\API\Context\SPI\Contextual
+     * @var \PHPCDI\SPI\Context\Contextual
      */
     private $contextual;
 
@@ -28,10 +31,10 @@ class CreationalContextImpl implements \PHPCDI\API\Context\SPI\CreationalContext
     private $parentDependentInstances;
 
     /**
-     * @param \PHPCDI\API\Context\SPI\Contextual $contextual
+     * @param \PHPCDI\SPI\Context\Contextual $contextual
      */
-    public function __construct($contextual, \ArrayObject $parentDependentInstances=null) {
-        $this->contextual= $contextual;
+    public function __construct(Contextual $contextual, \ArrayObject $parentDependentInstances=null) {
+        $this->contextual = $contextual;
         $this->incompleteInstances = new \SplObjectStorage();
         $this->dependentInstances = new \ArrayObject(array());
         
@@ -57,7 +60,7 @@ class CreationalContextImpl implements \PHPCDI\API\Context\SPI\CreationalContext
         }
     }
 
-    public function getCreationalContext(\PHPCDI\API\Context\SPI\Contextual $contextual) {
+    public function getCreationalContext(Contextual $contextual) {
         return new CreationalContextImpl($contextual, $this->dependentInstances);
     }
 

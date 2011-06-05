@@ -2,10 +2,14 @@
 
 namespace PHPCDI\Injection;
 
-class FieldProducer implements \PHPCDI\API\Inject\SPI\Producer {
+use PHPCDI\SPI\Producer;
+use PHPCDI\Bean\ProducerField;
+use PHPCDI\SPI\Context\CreationalContext;
+
+class FieldProducer implements Producer {
     private $producer;
     
-    public function __construct(\PHPCDI\Bean\ProducerField $producer) {
+    public function __construct(ProducerField $producer) {
         $this->producer = $producer;
     }
 
@@ -16,7 +20,7 @@ class FieldProducer implements \PHPCDI\API\Inject\SPI\Producer {
         return $this->producer->getPhpCdiInjectionPoints();
     }
 
-    public function produce($creationalContext) {
+    public function produce(CreationalContext $creationalContext) {
         $declaringBeanObj = $this->producer->getBeanManager()->getRefernce($this->producer->getDeclaringBean(), $this->producer->getMember()->getBaseType(), $creationalContext);
         $reflectionProperty = $this->producer->getMember()->getPHPMember();
         $reflectionProperty->setAccessible(true);

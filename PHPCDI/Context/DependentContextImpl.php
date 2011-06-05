@@ -2,14 +2,17 @@
 
 namespace PHPCDI\Context;
 
-use PHPCDI\API\Context\SPI\Context;
+use PHPCDI\SPI\Context\Context;
+use PHPCDI\SPI\Context\Contextual;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\API\Annotations;
 
 /**
  * Context implementation of Dependent scope.
  */
 class DependentContextImpl implements Context {
 
-    public function get($bean, $creationalContext = null) {
+    public function get(Contextual $bean, CreationalContext $creationalContext = null) {
         if($creationalContext != null) {
             $obj = $bean->create($creationalContext);
 
@@ -24,7 +27,7 @@ class DependentContextImpl implements Context {
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\Dependent::className();
+        return Annotations\Dependent::className();
     }
 
     public function isActive() {

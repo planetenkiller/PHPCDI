@@ -2,13 +2,27 @@
 
 namespace PHPCDI\Bean;
 
-/**
- * 
- */
-class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\Util\Beans as BeanUtil;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
+use PHPCDI\Injection\ManagedBeanInjectionTarget;
+use PHPCDI\API\Annotations;
+use PHPCDI\API\DefinitionException;
+use PHPCDI\Proxy\ProxyFactory;
+use PHPCDI\Proxy\ProxyObject;
+use PHPCDI\Decorator\DecorationHelper;
+use PHPCDI\Decorator\InterceptorAndDecoratorProxyMethodHandler;
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\SPI\InjectionPoint;
+use PHPCDI\SPI\InjectionTarget;
+use PHPCDI\SPI\Bean;
+
+class ManagedBean implements Bean {
 
     /**
-     * @var \PHPCDI\API\Inject\SPI\InjectionTarget
+     * @var \PHPCDI\SPI\InjectionTarget
      */
     private $injectionTarget;
     
@@ -17,7 +31,7 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
     private $name;
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\AnnotatedType
+     * @var \PHPCDI\SPI\AnnotatedType
      */
     protected $annotatedType;
 
@@ -43,46 +57,46 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
     private $beanManager;
 
 
-    public function __construct($className, \PHPCDI\API\Inject\SPI\AnnotatedType $annotatedType, \PHPCDI\Bean\BeanManager $beanManager) {
+    public function __construct($className, AnnotatedType $annotatedType, BeanManager $beanManager) {
         $this->className = $className;
         $this->annotatedType = $annotatedType;
         $this->injectionPoints = array();
         $this->initializerMethodsList = array();
-        $initializerMethodsList = \PHPCDI\Util\Beans::getInitializerMethods($this, $annotatedType);
+        $initializerMethodsList = BeanUtil::getInitializerMethods($this, $annotatedType);
         foreach($initializerMethodsList as $method) {
-            $points = \PHPCDI\Util\Beans::getParameterInjectionPoints($this, $method);
+            $points = BeanUtil::getParameterInjectionPoints($this, $method);
             $this->injectionPoints = \array_merge($this->injectionPoints, $points);
             $this->initializerMethodsList[] = array('method' => $method,
                                                     'injectionpoints' => $points);
         }
 
-        $this->injectionPoints = \array_merge($this->injectionPoints, \PHPCDI\Util\Beans::getParameterInjectionPointsOfConstructor($this, $annotatedType->getConstructor()));
-        $this->fieldInjectionPoints = \PHPCDI\Util\Beans::getFieldInjectionPoints($this, $annotatedType);
+        $this->injectionPoints = \array_merge($this->injectionPoints, BeanUtil::getParameterInjectionPointsOfConstructor($this, $annotatedType->getConstructor()));
+        $this->fieldInjectionPoints = BeanUtil::getFieldInjectionPoints($this, $annotatedType);
         $this->injectionPoints = \array_merge($this->injectionPoints, $this->fieldInjectionPoints);
-        $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($annotatedType);
+        $this->qualifiers = AnnotationUtil::getQualifiers($annotatedType);
         
         if(count($this->qualifiers) == 0 || (count($this->qualifiers) == 1 
-                && \PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, \PHPCDI\API\Inject\Named::className()))) {
-            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+                && AnnotationUtil::listHasAnnotation($this->qualifiers, Annotations\Named::className()))) {
+            $this->qualifiers[] = new Annotations\DefaultObj(array());
         }
         
-        if(!\PHPCDI\Util\Annotations::listHasAnnotation($this->qualifiers, \PHPCDI\API\Inject\Any::className())) {
-            $this->qualifiers[] = new \PHPCDI\API\Inject\Any(array());
+        if(!AnnotationUtil::listHasAnnotation($this->qualifiers, Annotations\Any::className())) {
+            $this->qualifiers[] = new Annotations\Any(array());
         }
         
-        $this->stereotypes = \PHPCDI\Util\Annotations::getStereotypes($annotatedType);
-        $this->postConstructMethods = \PHPCDI\Util\Beans::getPostConstructMethods($annotatedType);
+        $this->stereotypes = AnnotationUtil::getStereotypes($annotatedType);
+        $this->postConstructMethods = BeanUtil::getPostConstructMethods($annotatedType);
         $this->beanManager = $beanManager;
-        $this->injectionTarget = new \PHPCDI\Injection\ManagedBeanInjectionTarget($this);
+        $this->injectionTarget = new ManagedBeanInjectionTarget($this);
         
         
         // scope
-        $this->scope = \PHPCDI\Util\Annotations::getScope($annotatedType, false);
+        $this->scope = AnnotationUtil::getScope($annotatedType, false);
         
         if($this->scope == null) {
             $scopes = array();
             foreach($this->stereotypes as $anno) {
-                if(\PHPCDI\Util\Annotations::isScope(new \ReflectionClass($anno))) {
+                if(AnnotationUtil::isScope(new \ReflectionClass($anno))) {
                     $scopes[] = get_class($anno);
                 }
             }
@@ -90,47 +104,47 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
             if(count($scopes) == 1) {
                 $this->scope = $scopes[0];
             } else if(count($scopes) > 1) {
-                throw new \PHPCDI\API\DefinitionException('More than one scope available via stereotypes in managed bean ' . $className);
+                throw new DefinitionException('More than one scope available via stereotypes in managed bean ' . $className);
             } else {
-                $this->scope = 'PHPCDI\API\Inject\Dependent';
+                $this->scope = Annotations\Dependent::className();
             }
         }
         
         // name
         $this->name = null;
         $useDefaultName = false;
-        if($this->annotatedType->isAnnotationPresent(\PHPCDI\API\Inject\Named::className())) {
-            $namedAnnotation = $this->annotatedType->getAnnotation(\PHPCDI\API\Inject\Named::className());
+        if($this->annotatedType->isAnnotationPresent(Annotations\Named::className())) {
+            $namedAnnotation = $this->annotatedType->getAnnotation(Annotations\Named::className());
             
             if(empty($namedAnnotation->value)) {
                 $useDefaultName = true;
             } else {
                 $this->name = $namedAnnotation->value;
             }
-        } else if(isset($this->stereotypes[\PHPCDI\API\Inject\Named::className()]) && 
-                !empty($this->stereotypes[\PHPCDI\API\Inject\Named::className()]->value)) {
-            throw new \PHPCDI\API\DefinitionException('Stereotype contains @Named annotation with a value! Stereotype used by managed bean: ' . $className);
+        } else if(isset($this->stereotypes[Annotations\Named::className()]) && 
+                !empty($this->stereotypes[Annotations\Named::className()]->value)) {
+            throw new DefinitionException('Stereotype contains @Named annotation with a value! Stereotype used by managed bean: ' . $className);
         }
             
-        if($useDefaultName || isset($this->stereotypes[\PHPCDI\API\Inject\Named::className()])) {
+        if($useDefaultName || isset($this->stereotypes[Annotations\Named::className()])) {
             $startClass = strrpos($this->className, '\\');
 
             if($startClass !== false) {
-                $this->name = \PHPCDI\Util\ReflectionUtil::decapitalize(substr($this->className, $startClass + 1));
+                $this->name = ReflectionUtil::decapitalize(substr($this->className, $startClass + 1));
             } else {
-                $this->name = \PHPCDI\Util\ReflectionUtil::decapitalize($this->className);
+                $this->name = ReflectionUtil::decapitalize($this->className);
             }
         }
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
         $instance = $this->injectionTarget->produce($creationalContext);
         $this->injectionTarget->inject($instance, $creationalContext);
         $this->injectionTarget->postConstruct($instance);
         return $instance;
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
         $this->injectionTarget->preDestory($instance);
         $creationalContext->release();
     }
@@ -171,8 +185,8 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         return true;
     }
 
-    public function createInstance(\PHPCDI\API\Context\SPI\CreationalContext $creationalContext) {
-        $constructorParamInjectionPoints = \PHPCDI\Util\Beans::getParameterInjectionPointsOfConstructor($this, $this->annotatedType->getConstructor());
+    public function createInstance(CreationalContext $creationalContext) {
+        $constructorParamInjectionPoints = BeanUtil::getParameterInjectionPointsOfConstructor($this, $this->annotatedType->getConstructor());
 
         $args = array();
         foreach($constructorParamInjectionPoints as $injection) {
@@ -182,7 +196,7 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         $reflectionClass = $this->annotatedType->getPHPClass();
         
         if($this->isProxyRequired()) {
-            $proxyfactory = new \PHPCDI\Proxy\ProxyFactory();
+            $proxyfactory = new ProxyFactory();
             $reflectionClass = $proxyfactory->extend($reflectionClass->name)->createClass();
         }
 
@@ -228,13 +242,13 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         return $this->getDecorators() != null && \count($this->getDecorators()) > 0;
     }
     
-    public function applyDecorators(\PHPCDI\Proxy\ProxyObject $obj, \PHPCDI\API\Context\SPI\CreationalContext $ctx, \PHPCDI\API\Inject\SPI\InjectionPoint $ij) {
-        $decorationHelper = new \PHPCDI\Decorator\DecorationHelper($obj, $this, $this->beanManager);
-        \PHPCDI\Decorator\DecorationHelper::getHelperStack()->push($decorationHelper);
+    public function applyDecorators(ProxyObject $obj, CreationalContext $ctx, InjectionPoint $ij) {
+        $decorationHelper = new DecorationHelper($obj, $this, $this->beanManager);
+        DecorationHelper::getHelperStack()->push($decorationHelper);
         $firstDelegate = $decorationHelper->getNextDelegate($ij, $ctx);
-        \PHPCDI\Decorator\DecorationHelper::getHelperStack()->pop();
+        DecorationHelper::getHelperStack()->pop();
         
-        $obj->setHandler(new \PHPCDI\Decorator\InterceptorAndDecoratorProxyMethodHandler($firstDelegate));
+        $obj->setHandler(new InterceptorAndDecoratorProxyMethodHandler($firstDelegate));
         
         return $obj;
     }
@@ -247,7 +261,7 @@ class ManagedBean implements \PHPCDI\API\Inject\SPI\Bean {
         return $this->injectionTarget;
     }
     
-    public function setInjectionTarget(\PHPCDI\API\Inject\SPI\InjectionTarget $injectionTarget) {
+    public function setInjectionTarget(InjectionTarget $injectionTarget) {
         $this->injectionTarget = $injectionTarget;
     }
     

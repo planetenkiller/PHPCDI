@@ -2,27 +2,31 @@
 
 namespace PHPCDI\Bean\Builtin;
 
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\API\Annotations;
+use PHPCDI\Util\ReflectionUtil;
 
 class ExtensionBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     
     /**
-     * @var \PHPCDI\Bean\BeanManager 
+     * @var \PHPCDI\Manager\BeanManager
      */
     private $beanManager;
     
     private $obj;
     
-    public function __construct(\PHPCDI\Bean\BeanManager $beanManager, $obj) {
+    public function __construct(BeanManager $beanManager, $obj) {
         $this->beanManager = $beanManager;
         $this->obj = $obj;
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
        return $this->obj;
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
     }
 
     public function getBeanClass() {
@@ -38,11 +42,11 @@ class ExtensionBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getQualifiers() {
-        return array(\PHPCDI\API\Inject\DefaultObj::newInstance(), \PHPCDI\API\Inject\Any::newInstance());
+        return array(Annotations\DefaultObj::newInstance(), Annotations\Any::newInstance());
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\ApplicationScoped::className();
+        return Annotations\ApplicationScoped::className();
     }
 
     public function getStereotypes() {
@@ -50,7 +54,7 @@ class ExtensionBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getTypes() {
-        return \PHPCDI\Util\ReflectionUtil::getClassNames($this->getBeanClass());
+        return ReflectionUtil::getClassNames($this->getBeanClass());
     }
 
     public function isAlternative() {

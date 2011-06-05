@@ -2,7 +2,10 @@
 
 namespace PHPCDI\Extensions\Doctrine2;
 
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\BeanManager;
+use PHPCDI\API\Annotations;
+use PHPCDI\SPI\Context\CreationalContext;
 
 class RepositoryBean implements Bean {
     
@@ -10,17 +13,17 @@ class RepositoryBean implements Bean {
     private $entity;
     
     /**
-     * @var PHPCDI\API\Inject\SPI\BeanManager
+     * @var PHPCDI\SPI\BeanManager
      */
     private $beanManager;
     
-    public function __construct($class, $entity, \PHPCDI\API\Inject\SPI\BeanManager $beanManager) {
+    public function __construct($class, $entity, BeanManager $beanManager) {
         $this->class = $class;
         $this->entity = $entity;
         $this->beanManager = $beanManager;
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
         $ctx = $this->beanManager->createCreationalContext($this);
         $emBean = $this->beanManager->resolve($this->beanManager->getBeans('Doctrine\ORM\EntityManager', array()));
         $em = $this->beanManager->getRefernce($emBean, 'Doctrine\ORM\EntityManager', $ctx);
@@ -29,7 +32,7 @@ class RepositoryBean implements Bean {
         return $em->getRepository($this->entity);
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
     }
 
     public function getBeanClass() {
@@ -45,11 +48,11 @@ class RepositoryBean implements Bean {
     }
 
     public function getQualifiers() {
-        return array(\PHPCDI\API\Inject\DefaultObj::newInstance(), \PHPCDI\API\Inject\Any::newInstance());
+        return array(Annotations\DefaultObj::newInstance(), Annotations\Any::newInstance());
     }
 
     public function getScope() {
-        return 'PHPCDI\API\Inject\ApplicationScoped';
+        return Annotations\ApplicationScoped::className();
     }
 
     public function getStereotypes() {

@@ -2,6 +2,9 @@
 
 namespace PHPCDI\Resolution;
 
+use PHPCDI\Util\Beans as BeanUtil;
+use PHPCDI\Util\ReflectionUtil;
+
 /**
  * A ObserverMethod reslover based on types/qualifiers of the ObserverMethods.
  */
@@ -26,12 +29,12 @@ class TypeSafeObserverReslover implements Resolver {
         }
         
         foreach($this->observers as $observer) {
-            if(\in_array($observer->getObservedType(), \PHPCDI\Util\ReflectionUtil::getClassNames($beanType))) {
-                if($typeFilter && !\in_array($observer->getObservedTypeFilter(), \PHPCDI\Util\ReflectionUtil::getClassNames($typeFilter))) {
+            if(\in_array($observer->getObservedType(), ReflectionUtil::getClassNames($beanType))) {
+                if($typeFilter && !\in_array($observer->getObservedTypeFilter(), ReflectionUtil::getClassNames($typeFilter))) {
                     continue;
                 }
                 
-                if(!\PHPCDI\Util\Beans::containsAllQualifiers($observer->getObservedQualifiers(), $qualifiers)) {
+                if(!BeanUtil::containsAllQualifiers($observer->getObservedQualifiers(), $qualifiers)) {
                     continue;
                 }
 

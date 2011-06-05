@@ -2,11 +2,14 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class BeforeBeanDiscoveryImpl implements \PHPCDI\API\Event\BeforeBeanDiscovery {
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\API\Event\BeforeBeanDiscovery;
+
+class BeforeBeanDiscoveryImpl implements BeforeBeanDiscovery {
     
     private $types = array();
     
-    public function addAnnotatedType(\PHPCDI\API\Inject\SPI\AnnotatedType $annotatedType) {
+    public function addAnnotatedType(AnnotatedType $annotatedType) {
         $this->types[] = $annotatedType;
     }
     

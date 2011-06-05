@@ -2,7 +2,7 @@
 
 namespace PHPCDI\Injection;
 
-use PHPCDI\API\Inject\SPI\InjectionPoint;
+use PHPCDI\SPI\InjectionPoint;
 
 /**
  * An InjectionPoint that delegates all calls to an another InjectionPoint.
@@ -10,7 +10,7 @@ use PHPCDI\API\Inject\SPI\InjectionPoint;
 abstract class ForwardingInjectionPoint implements InjectionPoint {
     
     /**
-     * @return \PHPCDI\API\Inject\SPI\InjectionPoint
+     * @return \PHPCDI\SPI\InjectionPoint
      */
     protected abstract function getDelegate();
 

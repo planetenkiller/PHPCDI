@@ -4,7 +4,7 @@ namespace PHPCDI\API\Event;
 
 interface ProcessProducerField extends ProcessBean {
     /**
-     * @return \PHPCDI\API\Inject\SPI\AnnotatedField
+     * @return \PHPCDI\SPI\AnnotatedField
      */
     public function getAnnotatedProducerField();
 }

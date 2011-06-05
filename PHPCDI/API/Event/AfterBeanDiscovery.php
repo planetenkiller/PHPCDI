@@ -2,10 +2,14 @@
 
 namespace PHPCDI\API\Event;
 
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\ObserverMethod;
+use PHPCDI\SPI\Context\Context;
+
 interface AfterBeanDiscovery {
     public function addDefinitionError(\Exception $e);
-    public function addBean(\PHPCDI\API\Inject\SPI\Bean $bean);
-    public function addObserverMethod(\PHPCDI\API\Inject\SPI\ObserverMethod $observerMethod);
-    public function addContext(\PHPCDI\API\Context\SPI\Context $context);
+    public function addBean(Bean $bean);
+    public function addObserverMethod(ObserverMethod $observerMethod);
+    public function addContext(Context $context);
 }
 

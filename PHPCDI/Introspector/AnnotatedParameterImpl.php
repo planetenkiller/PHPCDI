@@ -2,7 +2,13 @@
 
 namespace PHPCDI\Introspector;
 
-class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParameter {
+use PHPCDI\SPI\AnnotatedParameter;
+use PHPCDI\SPI\AnnotatedCallable;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
+use PHPCDI\API\Annotations;
+
+class AnnotatedParameterImpl implements AnnotatedParameter {
 
     private $reflectionParameter;
     private $method;
@@ -10,14 +16,14 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
     private $baseType;
     private $allTypes;
 
-    public function __construct(\PHPCDI\API\Inject\SPI\AnnotatedCallable $method, \ReflectionParameter $parameter) {
+    public function __construct(AnnotatedCallable $method, \ReflectionParameter $parameter) {
         $this->reflectionParameter = $parameter;
         $this->method = $method;
-        $this->annotations = \PHPCDI\Util\Annotations::reader()->getMethodAnnotations($method->getPHPMember());
+        $this->annotations = AnnotationUtil::reader()->getMethodAnnotations($method->getPHPMember());
 
         if($parameter->getClass() != null) {
             $this->baseType = $parameter->getClass()->name;
-            $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($this->baseType));
+            $this->allTypes = ReflectionUtil::getClassNames(new \ReflectionClass($this->baseType));
         } else if($parameter->isArray()) {
             $this->baseType = 'array';
             $this->allTypes = array('array', 'mixed');
@@ -35,8 +41,8 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
 
             if($paramAnnotation != null) {
                 $this->baseType = $paramAnnotation->type;
-                $this->baseType = \PHPCDI\Util\ReflectionUtil::resolveRelativeClassName($this->baseType, $parameter->getDeclaringClass());
-                $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames($this->baseType);
+                $this->baseType = ReflectionUtil::resolveRelativeClassName($this->baseType, $parameter->getDeclaringClass());
+                $this->allTypes = ReflectionUtil::getClassNames($this->baseType);
                 $this->annotations['PHPCDI\Util\PhpDoc\PhpDocParam'] = $paramAnnotation;
             } else {
                 $this->baseType = 'mixed';
@@ -47,21 +53,21 @@ class AnnotatedParameterImpl implements \PHPCDI\API\Inject\SPI\AnnotatedParamete
             $this->allTypes = array('mixed');
         }
         
-        if(isset($this->annotations[\PHPCDI\API\Inject\P::className()])) {
+        if(isset($this->annotations[Annotations\P::className()])) {
             // extract annotations for this parameter
             $paramAnnotation = null;
-            if(\is_array($this->annotations[\PHPCDI\API\Inject\P::className()])) {
-                foreach($this->annotations[\PHPCDI\API\Inject\P::className()] as $param) {
+            if(\is_array($this->annotations[Annotations\P::className()])) {
+                foreach($this->annotations[Annotations\P::className()] as $param) {
                     if($param->name == $parameter->name) {
                         $paramAnnotation = $param;
                     }
                 }
-            } else if($this->annotations[\PHPCDI\API\Inject\P::className()]->name == $parameter->name) {
-                $paramAnnotation = $this->annotations[\PHPCDI\API\Inject\P::className()];
+            } else if($this->annotations[Annotations\P::className()]->name == $parameter->name) {
+                $paramAnnotation = $this->annotations[Annotations\P::className()];
             }
             
             // remove all annotaton holder annotations
-            unset($this->annotations[\PHPCDI\API\Inject\P::className()]);
+            unset($this->annotations[Annotations\P::className()]);
             
             if($paramAnnotation != null) {
                 // add parameter annotations as first level annotations

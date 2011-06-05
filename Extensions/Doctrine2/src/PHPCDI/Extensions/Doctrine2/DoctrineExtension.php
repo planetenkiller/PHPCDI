@@ -2,17 +2,22 @@
 
 namespace PHPCDI\Extensions\Doctrine2;
 
+use PHPCDI\SPI\BeanManager;
+use PHPCDI\API\Event\AfterBeanDiscovery;
+use PHPCDI\API\DefinitionException;
+use PHPCDI\API\Event\ProcessAnnotatedType;
+
 class DoctrineExtension {
     private $repositories = array();
     
     /**
      * @Annos(@Observes @TypeFilter("Doctrine\ORM\EntityRepository") $event)
      */
-    public function addUserRepository(\PHPCDI\API\Event\ProcessAnnotatedType $event) {
+    public function addUserRepository(ProcessAnnotatedType $event) {
         $entityRepositoryAnnotation = $event->getAnnotatedType()->getAnnotation('PHPCDI\Extensions\Doctrine2\Annotations\EntityRepository');
         
         if($entityRepositoryAnnotation == null) {
-            $event->addDefinitionError(new \PHPCDI\API\DefinitionException('EntityRepository ' . $event->getAnnotatedType()->getBaseType() . ' must define the @EntityRepository annotation'));
+            $event->addDefinitionError(new DefinitionException('EntityRepository ' . $event->getAnnotatedType()->getBaseType() . ' must define the @EntityRepository annotation'));
         } else {
             $this->repositories[$entityRepositoryAnnotation->value] = $event->getAnnotatedType()->getBaseType();
         }
@@ -21,7 +26,7 @@ class DoctrineExtension {
     /**
      * @Annos(@Observes $event)
      */
-    public function toBeans(\PHPCDI\API\Event\AfterBeanDiscovery $event, \PHPCDI\API\Inject\SPI\BeanManager $beanManager) {
+    public function toBeans(AfterBeanDiscovery $event, BeanManager $beanManager) {
         foreach ($this->repositories as $entityClass => $repositoryClass) {
             $event->addBean(new RepositoryBean($repositoryClass, $entityClass, $beanManager));
         }

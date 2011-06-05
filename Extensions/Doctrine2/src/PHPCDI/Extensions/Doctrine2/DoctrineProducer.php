@@ -2,6 +2,11 @@
 
 namespace PHPCDI\Extensions\Doctrine2;
 
+use PHPCDI\SPI\InjectionPoint;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Configuration;
+use PHPCDI\API\DefinitionException;
+
 /**
  * Contains doctrine related producers. 
  */
@@ -18,8 +23,8 @@ class DoctrineProducer {
      * @ApplicationScoped
      * @return Doctrine\ORM\EntityManager
      */
-    public function produceEntityManager($connection, \Doctrine\ORM\Configuration $config) {
-        return \Doctrine\ORM\EntityManager::create($connection, $config);
+    public function produceEntityManager($connection, Configuration $config) {
+        return EntityManager::create($connection, $config);
     }
     
     /**
@@ -30,13 +35,13 @@ class DoctrineProducer {
      * @Produces
      * @return Doctrine\ORM\EntityRepository
      */
-    public function produceRepository(\Doctrine\ORM\EntityManager $em, \PHPCDI\API\Inject\SPI\InjectionPoint $ij) {
+    public function produceRepository(EntityManager $em, InjectionPoint $ij) {
         $entityRepositoryAnnotation = $ij->getAnnotated()->getAnnotation('PHPCDI\Extensions\Doctrine2\Annotations\EntityRepository');
         
         if($entityRepositoryAnnotation != null) {
             return $em->getRepository($entityRepositoryAnnotation->value);
         } else {
-            throw new \PHPCDI\API\DefinitionException('Injection point [' . $ij . '] must define the @EntityRepository annotation');
+            throw new DefinitionException('Injection point [' . $ij . '] must define the @EntityRepository annotation');
         }
     }
 }

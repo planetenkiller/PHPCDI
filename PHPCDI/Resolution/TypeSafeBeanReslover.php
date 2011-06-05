@@ -2,6 +2,9 @@
 
 namespace PHPCDI\Resolution;
 
+use PHPCDI\API\Annotations;
+use PHPCDI\Util\Beans as BeanUtil;
+
 /**
  * A bean reslover based on types/qualifiers of the beans.
  */
@@ -17,16 +20,16 @@ class TypeSafeBeanReslover implements Resolver {
     }
 
     public function reslove($beanType, $qualifiers) {
-        if($beanType == 'PHPCDI\API\Instance\Instance' 
-                || $beanType == 'PHPCDI\API\Event\Event') {
-            $qualifiers = array(\PHPCDI\API\Inject\Any::className());
+        if($beanType == 'PHPCDI\API\Instance' 
+                || $beanType == 'PHPCDI\API\Event') {
+            $qualifiers = array(Annotations\Any::className());
         }
         
         $beans = array();
 
         foreach($this->beans as $bean) {
             if(\in_array($beanType, $bean->getTypes())) {
-                if(!\PHPCDI\Util\Beans::compareQualifiers($bean->getQualifiers(), $qualifiers)) {
+                if(!BeanUtil::compareQualifiers($bean->getQualifiers(), $qualifiers)) {
                     continue;
                 }
 

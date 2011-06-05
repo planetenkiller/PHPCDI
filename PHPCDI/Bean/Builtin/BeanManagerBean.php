@@ -2,28 +2,31 @@
 
 namespace PHPCDI\Bean\Builtin;
 
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\API\Annotations as Annotations;
+use PHPCDI\SPI\Context\CreationalContext;
 
 class BeanManagerBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     
     /**
-     * @var \PHPCDI\Bean\BeanManager 
+     * @var \PHPCDI\Manager\BeanManager 
      */
     private $beanManager;
     
-    public function __construct(\PHPCDI\Bean\BeanManager $beanManager) {
+    public function __construct(BeanManager $beanManager) {
         $this->beanManager = $beanManager;
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
        return $this->beanManager;
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
     }
 
     public function getBeanClass() {
-        return 'PHPCDI\API\Inject\SPI\BeanManager';
+        return 'PHPCDI\SPI\BeanManager';
     }
 
     public function getInjectionPoints() {
@@ -35,11 +38,11 @@ class BeanManagerBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getQualifiers() {
-        return array(\PHPCDI\API\Inject\DefaultObj::newInstance(), \PHPCDI\API\Inject\Any::newInstance());
+        return array(Annotations\DefaultObj::newInstance(), Annotations\Any::newInstance());
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\ApplicationScoped::className();
+        return Annotations\ApplicationScoped::className();
     }
 
     public function getStereotypes() {
@@ -47,7 +50,7 @@ class BeanManagerBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getTypes() {
-        return array('PHPCDI\API\Inject\SPI\BeanManager', 'mixed');
+        return array('PHPCDI\SPI\BeanManager', 'mixed');
     }
 
     public function isAlternative() {
@@ -59,6 +62,6 @@ class BeanManagerBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
     
     public function __toString() {
-        return "BeanManager Bean of class PHPCDI\API\Inject\SPI\BeanManager";
+        return "BeanManager Bean of class PHPCDI\SPI\BeanManager";
     }
 }

@@ -2,28 +2,31 @@
 
 namespace PHPCDI\Bean\Builtin;
 
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\API\Annotations;
 
 class InjectionPointBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     
     /**
-     * @var \PHPCDI\Bean\BeanManager 
+     * @var \PHPCDI\Manager\BeanManager
      */
     private $beanManager;
     
-    public function __construct(\PHPCDI\Bean\BeanManager $beanManager) {
+    public function __construct(BeanManager $beanManager) {
         $this->beanManager = $beanManager;
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
        return $this->beanManager->getCurrentInjectionPoint();
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
     }
 
     public function getBeanClass() {
-        return 'PHPCDI\API\Inject\SPI\InjectionPoint';
+        return 'PHPCDI\SPI\InjectionPoint';
     }
 
     public function getInjectionPoints() {
@@ -35,11 +38,11 @@ class InjectionPointBean implements Bean, DynamicLookupUnsupported, BuiltinBean 
     }
 
     public function getQualifiers() {
-        return array(\PHPCDI\API\Inject\DefaultObj::newInstance(), \PHPCDI\API\Inject\Any::newInstance());
+        return array(Annotations\DefaultObj::newInstance(), Annotations\Any::newInstance());
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\Dependent::className();
+        return Annotations\Dependent::className();
     }
 
     public function getStereotypes() {
@@ -47,7 +50,7 @@ class InjectionPointBean implements Bean, DynamicLookupUnsupported, BuiltinBean 
     }
 
     public function getTypes() {
-        return array('PHPCDI\API\Inject\SPI\InjectionPoint', 'mixed');
+        return array('PHPCDI\SPI\InjectionPoint', 'mixed');
     }
 
     public function isAlternative() {
@@ -59,6 +62,6 @@ class InjectionPointBean implements Bean, DynamicLookupUnsupported, BuiltinBean 
     }
     
     public function __toString() {
-        return "Builtin Bean for class PHPCDI\API\Inject\SPI\InjectionPoint";
+        return "Builtin Bean for class PHPCDI\SPI\InjectionPoint";
     }
 }

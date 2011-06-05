@@ -2,13 +2,17 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessBeanImpl implements \PHPCDI\API\Event\ProcessBean{
+use PHPCDI\API\Event\ProcessBean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\AnnotatedType;
+
+class ProcessBeanImpl implements ProcessBean {
     private $erros = array();
     private $bean;
     private $type;
 
 
-    public function __construct(\PHPCDI\API\Inject\SPI\Bean $bean, \PHPCDI\API\Inject\SPI\AnnotatedType $type=null) {
+    public function __construct(Bean $bean, AnnotatedType $type=null) {
         $this->bean = $bean;
         $this->type = $type;
     }

@@ -2,13 +2,16 @@
 
 namespace PHPCDI\Injection;
 
+use PHPCDI\SPI\InjectionPoint;
+use PHPCDI\Util\Beans as BeanUtil;
+
 class EventFacadeInjectionPoint extends ForwardingInjectionPoint {
     private $delegate;
     private $qualifier;
     
-    public function __construct(\PHPCDI\API\Inject\SPI\InjectionPoint $delegate, array $newQualifier) {
+    public function __construct(InjectionPoint $delegate, array $newQualifier) {
         $this->delegate = $delegate;
-        $this->qualifier = \PHPCDI\Util\Beans::mergeQualifiers(parent::getQualifiers(), $newQualifier);
+        $this->qualifier = BeanUtil::mergeQualifiers(parent::getQualifiers(), $newQualifier);
     }
     
     protected function getDelegate() {

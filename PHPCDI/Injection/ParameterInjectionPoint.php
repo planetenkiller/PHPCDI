@@ -2,18 +2,19 @@
 
 namespace PHPCDI\Injection;
 
-/**
- *
- */
-class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
+use PHPCDI\SPI\InjectionPoint;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\API\Annotations;
+
+class ParameterInjectionPoint implements InjectionPoint {
 
     /**
-     * @var \PHPCDI\API\Inject\SPI\Bean
+     * @var \PHPCDI\SPI\Bean
      */
     private $bean;
 
     /**
-     * @var \PHPCDI\API\Inject\SPI\AnnotatedParameter
+     * @var \PHPCDI\SPI\AnnotatedParameter
      */
     private $paramter;
 
@@ -22,10 +23,10 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     public function __construct($bean, $paramter) {
         $this->bean = $bean;
         $this->paramter = $paramter;
-        $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($this->paramter);
+        $this->qualifiers = AnnotationUtil::getQualifiers($this->paramter);
         
         if(empty($this->qualifiers)) {
-            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+            $this->qualifiers[] = new Annotations\DefaultObj(array());
         }
     }
 
@@ -38,7 +39,7 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
 
     /**
-     * @return \PHPCDI\API\Inject\SPI\Bean
+     * @return \PHPCDI\SPI\Bean
      */
     public function getBean() {
         return $this->bean;
@@ -56,7 +57,7 @@ class ParameterInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
 
     public function isDelegate() {
-        return $this->paramter->isAnnotationPresent(\PHPCDI\API\Inject\Delegate::className());
+        return $this->paramter->isAnnotationPresent(Annotations\Delegate::className());
     }
 
     public function isTransient() {

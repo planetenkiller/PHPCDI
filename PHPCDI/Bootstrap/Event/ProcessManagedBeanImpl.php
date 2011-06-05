@@ -2,11 +2,14 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessManagedBeanImpl implements \PHPCDI\API\Event\ProcessManagedBean {
+use PHPCDI\API\Event\ProcessManagedBean;
+use PHPCDI\Bean\ManagedBean;
+
+class ProcessManagedBeanImpl implements ProcessManagedBean {
     private $erros = array();
     private $bean;
     
-    public function __construct(\PHPCDI\Bean\ManagedBean $bean) {
+    public function __construct(ManagedBean $bean) {
         $this->bean = $bean;
     }
     

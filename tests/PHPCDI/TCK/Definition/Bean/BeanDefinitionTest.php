@@ -2,6 +2,8 @@
 
 namespace PHPCDI\TCK\Definition\Bean;
 
+use PHPCDI\API\Annotations;
+
 require_once __DIR__ . '/../../../../bootstrap.php';
 
 class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
@@ -23,7 +25,7 @@ class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
         $this->assertEquals(1, count($this->getBeans('RedSnapper')));
         
         $list = $this->getBeans('RedSnapper');
-        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $list[0]->getScope());
+        $this->assertEquals(Annotations\Dependent::className(), $list[0]->getScope());
     }
     
     public function testIsNullable() {
@@ -76,7 +78,7 @@ class BeanDefinitionTest extends \PHPCDI\TCK\AbstractTckTest {
     
     public function testMultipleStereotypes() {
         $bean = $this->getBean('ComplicatedTuna');
-        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $bean->getScope());
+        $this->assertEquals(Annotations\Dependent::className(), $bean->getScope());
         $this->assertEquals("complicatedTuna", $bean->getName());
     }
     

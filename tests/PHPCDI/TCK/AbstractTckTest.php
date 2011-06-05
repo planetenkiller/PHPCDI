@@ -9,12 +9,12 @@ $classLoader->register();
 
 abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @var PHPCDI\Container 
+     * @var PHPCDI\API\Container 
      */
     private $container;
     
     /**
-     * @var PHPCDI\API\Inject\SPI\BeanManager
+     * @var PHPCDI\SPI\BeanManager
      */
     private $manager;
     private $testClassNamespace;
@@ -26,10 +26,10 @@ abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {
         
         $path = __DIR__ . '/../../';
         
-        $deployment = new \PHPCDI\Bootstrap\Deployment();
-        $classBundle = new \PHPCDI\Bootstrap\FileScanClassBundle('classpath', $path, $namespace);
+        $deployment = new \PHPCDI\SPI\Bootstrap\Impl\Deployment();
+        $classBundle = new \PHPCDI\SPI\Bootstrap\Impl\FileScanClassBundle('classpath', $path, $namespace);
         $deployment->addClassBundle($classBundle);
-        $configuration = new \PHPCDI\Bootstrap\Configuration($deployment);
+        $configuration = new \PHPCDI\API\Configuration($deployment);
 
 
         $this->container = $configuration->buildContainer();
@@ -71,7 +71,7 @@ abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @return PHPCDI\API\Inject\SPI\BeanManager
+     * @return PHPCDI\SPI\BeanManager
      */
     protected function getManager() {
         return $this->manager;

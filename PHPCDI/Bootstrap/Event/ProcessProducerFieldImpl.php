@@ -2,11 +2,14 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessProducerFieldImpl implements \PHPCDI\API\Event\ProcessProducerField {
+use PHPCDI\API\Event\ProcessProducerField;
+use PHPCDI\Bean\ProducerField;
+
+class ProcessProducerFieldImpl implements ProcessProducerField {
     private $erros = array();
     private $bean;
     
-    public function __construct(\PHPCDI\Bean\ProducerField $bean) {
+    public function __construct(ProducerField $bean) {
         $this->bean = $bean;
     }
     

@@ -2,18 +2,21 @@
 
 namespace PHPCDI\Injection;
 
-/**
- *
- */
-class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
+use PHPCDI\SPI\InjectionPoint;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\API\Annotations;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\SPI\Context\CreationalContext;
+
+class FieldInjectionPoint implements InjectionPoint {
 
     /**
-     * @var \PHPCDI\API\Inject\SPI\Bean
+     * @var \PHPCDI\SPI\Bean
      */
     private $bean;
 
     /**
-     * @var \PHPCDI\API\Inject\SPI\AnnotatedField
+     * @var \PHPCDI\SPI\AnnotatedField
      */
     private $paramter;
 
@@ -22,10 +25,10 @@ class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     public function __construct($bean, $paramter) {
         $this->bean = $bean;
         $this->paramter = $paramter;
-        $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($this->paramter);
+        $this->qualifiers = AnnotationUtil::getQualifiers($this->paramter);
         
         if(empty($this->qualifiers)) {
-            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+            $this->qualifiers[] = new Annotations\DefaultObj(array());
         }
     }
 
@@ -38,7 +41,7 @@ class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
 
     /**
-     * @return \PHPCDI\API\Inject\SPI\Bean
+     * @return \PHPCDI\SPI\Bean
      */
     public function getBean() {
         return $this->bean;
@@ -56,14 +59,14 @@ class FieldInjectionPoint implements \PHPCDI\API\Inject\SPI\InjectionPoint {
     }
 
     public function isDelegate() {
-        return $this->paramter->isAnnotationPresent(\PHPCDI\API\Inject\Delegate::className());
+        return $this->paramter->isAnnotationPresent(Annotations\Delegate::className());
     }
 
     public function isTransient() {
         return false;
     }
 
-    public function inject($declaringInstance, \PHPCDI\Bean\BeanManager $mgr, \PHPCDI\API\Context\SPI\CreationalContext $ctx) {
+    public function inject($declaringInstance, BeanManager $mgr, CreationalContext $ctx) {
         $objectToInject = $mgr->getInjectableReference($this, $ctx);
         $reflectionField = $this->getMember();
         $reflectionField->setAccessible(true);

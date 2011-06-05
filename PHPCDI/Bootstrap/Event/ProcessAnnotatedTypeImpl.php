@@ -2,7 +2,10 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessAnnotatedTypeImpl implements \PHPCDI\API\Event\ProcessAnnotatedType {
+use PHPCDI\API\Event\ProcessAnnotatedType;
+use PHPCDI\SPI\AnnotatedType;
+
+class ProcessAnnotatedTypeImpl implements ProcessAnnotatedType {
     private $type;
     private $veto = false;
     
@@ -10,12 +13,12 @@ class ProcessAnnotatedTypeImpl implements \PHPCDI\API\Event\ProcessAnnotatedType
         return $this->type;
     }
     
-    public function setAnnotatedType(\PHPCDI\API\Inject\SPI\AnnotatedType $type) {
+    public function setAnnotatedType(AnnotatedType $type) {
        $this->type = $type;
     }
     
     public function veto() {
-        $this->veto = tru;
+        $this->veto = true;
     }
     
     public function hasVeto() {

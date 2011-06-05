@@ -2,6 +2,8 @@
 
 namespace PHPCDI\Util;
 
+use PHPCDI\API\Annotations;
+
 require_once __DIR__ . '/../../bootstrap.php';
 
 
@@ -51,18 +53,18 @@ class AnnotationParserTest extends \PHPUnit_Framework_TestCase {
         $parser = new AnnotationParser();
         $reader = new \Doctrine\Common\Annotations\AnnotationReader(null, $parser);
         $reader->setAutoloadAnnotations(true);
-        $reader->setDefaultAnnotationNamespace('PHPCDI\API\Inject\\');
+        $reader->setDefaultAnnotationNamespace('PHPCDI\API\Annotations\\');
 
         $annos = $reader->getMethodAnnotations(new \ReflectionMethod('PHPCDI\Util\AnnotationParserTest', 'testParmeterAnnotations'));
 
         $this->assertNotNull($annos);
         $this->assertEquals(2, \count($annos));
-        $this->assertTrue(isset ($annos[\PHPCDI\API\Inject\P::className()]));
-        $this->assertEquals('user', $annos[\PHPCDI\API\Inject\P::className()]->name);
-        $this->assertTrue(\is_array($annos[\PHPCDI\API\Inject\P::className()]->value));
-        $this->assertEquals(2, \count($annos[\PHPCDI\API\Inject\P::className()]->value));
-        $this->assertInstanceOf(\PHPCDI\API\Inject\Inject::className(), $annos[\PHPCDI\API\Inject\P::className()]->value[0]);
-        $this->assertInstanceOf(\PHPCDI\API\Inject\Any::className(), $annos[\PHPCDI\API\Inject\P::className()]->value[1]);
+        $this->assertTrue(isset ($annos[Annotations\P::className()]));
+        $this->assertEquals('user', $annos[Annotations\P::className()]->name);
+        $this->assertTrue(\is_array($annos[Annotations\P::className()]->value));
+        $this->assertEquals(2, \count($annos[Annotations\P::className()]->value));
+        $this->assertInstanceOf(Annotations\Inject::className(), $annos[Annotations\P::className()]->value[0]);
+        $this->assertInstanceOf(Annotations\Any::className(), $annos[Annotations\P::className()]->value[1]);
     }
 }
 

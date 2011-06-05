@@ -3,6 +3,7 @@
 namespace PHPCDI\Util;
 
 use Doctrine\Common\Annotations\Lexer;
+use PHPCDI\API\Annotations as AnnotationsPkg;
 
 /**
  * An extenstion to the default doctrine common annotation parser to support
@@ -77,7 +78,7 @@ class AnnotationParser extends \Doctrine\Common\Annotations\Parser {
 
                         $this->isNestedAnnotation = false;
 
-                        return $this->newAnnotation(\PHPCDI\API\Inject\P::className(), array('value' => $annos, 'name' => $paramName));
+                        return $this->newAnnotation(AnnotationsPkg\P::className(), array('value' => $annos, 'name' => $paramName));
                     } else {
                         $type = 'mixed';
                         

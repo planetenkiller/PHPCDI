@@ -2,17 +2,22 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class AfterBeanDiscoveryImpl implements \PHPCDI\API\Event\AfterBeanDiscovery {
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\Context\Context;
+use PHPCDI\SPI\ObserverMethod;
+use PHPCDI\API\Event\AfterBeanDiscovery;
+
+class AfterBeanDiscoveryImpl implements AfterBeanDiscovery {
     private $beans = array();
     private $contexts = array();
     private $errors = array();
     private $observers = array();
 
-    public function addBean(\PHPCDI\API\Inject\SPI\Bean $bean) {
+    public function addBean(Bean $bean) {
         $this->beans[] = $bean;
     }
 
-    public function addContext(\PHPCDI\API\Context\SPI\Context $context) {
+    public function addContext(Context $context) {
         $this->contexts[] = $context;
     }
 
@@ -20,7 +25,7 @@ class AfterBeanDiscoveryImpl implements \PHPCDI\API\Event\AfterBeanDiscovery {
         $this->errors[] = $e;
     }
 
-    public function addObserverMethod(\PHPCDI\API\Inject\SPI\ObserverMethod $observerMethod) {
+    public function addObserverMethod(ObserverMethod $observerMethod) {
         $this->observers[] = $observerMethod;
     }
     

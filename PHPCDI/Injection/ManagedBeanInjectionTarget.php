@@ -2,7 +2,10 @@
 
 namespace PHPCDI\Injection;
 
-use PHPCDI\API\Inject\SPI\InjectionTarget;
+use PHPCDI\SPI\InjectionTarget;
+use PHPCDI\Bean\ManagedBean;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\Util\Beans as BeanUtil;
 
 /**
  * Injection target for managed beans.
@@ -13,7 +16,7 @@ class ManagedBeanInjectionTarget implements InjectionTarget {
      */
     private $bean;
 
-    public function __construct(\PHPCDI\Bean\ManagedBean $bean) {
+    public function __construct(ManagedBean $bean) {
         $this->bean = $bean;
     }
 
@@ -23,8 +26,8 @@ class ManagedBeanInjectionTarget implements InjectionTarget {
     public function getInjectionPoints() {
 
     }
-    public function inject($instance, $creationalContext) {
-        \PHPCDI\Util\Beans::injectFieldsAndInitializers(
+    public function inject($instance, CreationalContext $creationalContext) {
+        BeanUtil::injectFieldsAndInitializers(
                 $instance,
                 $creationalContext,
                 $this->bean->getBeanManager(),
@@ -40,10 +43,7 @@ class ManagedBeanInjectionTarget implements InjectionTarget {
 
     }
 
-    /**
-     * @param \PHPCDI\API\Context\SPI\CreationalContext $creationalContext
-     */
-    public function produce($creationalContext) {
+    public function produce(CreationalContext $creationalContext) {
         if(!$this->bean->hasDecorators()) {
             $instance = $this->bean->createInstance($creationalContext);
             $creationalContext->push($instance);

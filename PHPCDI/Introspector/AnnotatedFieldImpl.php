@@ -2,7 +2,12 @@
 
 namespace PHPCDI\Introspector;
 
-class AnnotatedFieldImpl implements \PHPCDI\API\Inject\SPI\AnnotatedField {
+use PHPCDI\SPI\AnnotatedField;
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
+
+class AnnotatedFieldImpl implements AnnotatedField {
 
     private $reflectionProperty;
     private $annotations;
@@ -11,17 +16,17 @@ class AnnotatedFieldImpl implements \PHPCDI\API\Inject\SPI\AnnotatedField {
     private $baseType;
     private $allTypes;
 
-    public function __construct(\PHPCDI\API\Inject\SPI\AnnotatedType $type, \ReflectionProperty $property) {
+    public function __construct(AnnotatedType $type, \ReflectionProperty $property) {
         $this->reflectionProperty = $property;
-        $this->annotations = \PHPCDI\Util\Annotations::reader()->getPropertyAnnotations($property);
+        $this->annotations = AnnotationUtil::reader()->getPropertyAnnotations($property);
         $this->annotatedType = $type;
-        $this->baseType = \PHPCDI\Util\Annotations::getPropertyType($property);
+        $this->baseType = AnnotationUtil::getPropertyType($property);
         if(empty ($this->baseType)) {
             $this->baseType = 'mixed';
             $this->allTypes = array('mixed');
         } else {
-            $this->baseType = \PHPCDI\Util\ReflectionUtil::resolveRelativeClassName($this->baseType, $property->getDeclaringClass());
-            $this->allTypes = \PHPCDI\Util\ReflectionUtil::getClassNames($this->baseType);
+            $this->baseType = ReflectionUtil::resolveRelativeClassName($this->baseType, $property->getDeclaringClass());
+            $this->allTypes = ReflectionUtil::getClassNames($this->baseType);
         }
     }
 

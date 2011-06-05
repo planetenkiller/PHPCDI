@@ -3,7 +3,7 @@
 namespace PHPCDI\Bean\Builtin;
 
 /**
- * This marker interface marks PHPCDI\API\Inject\SPI\Bean Objects which
+ * This marker interface marks PHPCDI\SPI\Bean objects which
  * do not support dynamic lookup.
  */
 interface DynamicLookupUnsupported {

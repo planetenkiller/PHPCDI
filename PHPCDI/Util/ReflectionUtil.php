@@ -2,6 +2,8 @@
 
 namespace PHPCDI\Util;
 
+use PHPCDI\API\Annotations as AnnotationsPkg;
+
 abstract class ReflectionUtil {
     private static $PRIMITIVE_TYPES = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'mixed', 'object');
     private static $PRIMITIVE_TYPE_ALIASES = array('bool' => 'boolean',
@@ -92,7 +94,7 @@ abstract class ReflectionUtil {
         $isAbstract = $reflectionClass->isAbstract() || $reflectionClass->isInterface();
         $isAnnotation = \in_array('Doctrine\Common\Annotations\Annotation', \class_parents($reflectionClass->name));
         $hasAtInject = $reflectionClass->getConstructor() != null
-                           ? Annotations::reader()->getMethodAnnotation($reflectionClass->getConstructor(), \PHPCDI\API\Inject\Inject::className()) != null
+                           ? Annotations::reader()->getMethodAnnotation($reflectionClass->getConstructor(), AnnotationsPkg\Inject::className()) != null
                            : false;
         $hasParameter = $reflectionClass->getConstructor() != null
                             ? $reflectionClass->getConstructor()->getNumberOfParameters() > 0

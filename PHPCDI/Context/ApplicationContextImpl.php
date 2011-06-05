@@ -2,7 +2,10 @@
 
 namespace PHPCDI\Context;
 
-use PHPCDI\API\Context\SPI\Context;
+use PHPCDI\SPI\Context\Context;
+use PHPCDI\SPI\Context\Contextual;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\API\Annotations;
 
 /**
  * Context implementation of application scope.
@@ -17,7 +20,7 @@ class ApplicationContextImpl implements Context {
         $this->idStore = new \SplObjectStorage();
     }
 
-    public function get($bean, $creationalContext = null) {
+    public function get(Contextual $bean, CreationalContext $creationalContext = null) {
         $id = $this->getId($bean);
 
         if(isset($this->instances[$id])) {
@@ -34,14 +37,14 @@ class ApplicationContextImpl implements Context {
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\ApplicationScoped::className();
+        return Annotations\ApplicationScoped::className();
     }
 
     public function isActive() {
         return true;
     }
 
-    private function getId(\PHPCDI\API\Context\SPI\Contextual $contextual) {
+    private function getId(Contextual $contextual) {
         if(isset($this->idStore[$contextual])) {
             return $this->idStore[$contextual];
         } else {

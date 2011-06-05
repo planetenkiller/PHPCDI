@@ -2,10 +2,15 @@
 
 namespace PHPCDI\Bean;
 
-use PHPCDI\API\Inject\SPI\AnnotatedMember;
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\AnnotatedMember;
+use PHPCDI\SPI\Bean;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
+use PHPCDI\API\Annotations;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\SPI\Producer;
 
-abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
+abstract class AbstractProducer implements Bean {
 
     /**
      * @var string
@@ -13,18 +18,18 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
     private $declaringBeanClassName;
 
     /**
-     * @var PHPCDI\API\Inject\SPI\Bean
+     * @var PHPCDI\SPI\Bean
      */
     protected $declaringBean;
 
     /**
-     * @var PHPCDI\API\Inject\SPI\AnnotatedMember
+     * @var PHPCDI\SPI\AnnotatedMember
      */
     protected $member;
     
     /**
      *
-     * @var \PHPCDI\API\Inject\SPI\Producer
+     * @var \PHPCDI\SPI\Producer
      */
     protected $producer;
 
@@ -39,21 +44,21 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
         $this->declaringBeanClassName = $member->getDeclaringType()->getBaseType();
         $this->injectionpoints = $injectionPoints;
 
-        $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($member);
+        $this->qualifiers = AnnotationUtil::getQualifiers($member);
         if(empty($this->qualifiers)) {
-            $this->qualifiers[] = new \PHPCDI\API\Inject\Any(array());
-            $this->qualifiers[] = new \PHPCDI\API\Inject\DefaultObj(array());
+            $this->qualifiers[] = new Annotations\Any(array());
+            $this->qualifiers[] = new Annotations\DefaultObj(array());
         }
 
-        $this->stereotypes = \PHPCDI\Util\Annotations::getStereotypes($member);
-        $this->scope = \PHPCDI\Util\Annotations::getScope($member);
+        $this->stereotypes = AnnotationUtil::getStereotypes($member);
+        $this->scope = AnnotationUtil::getScope($member);
     }
     
     
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
         $obj = $this->producer->produce($creationalContext);
         
-        if($this->getScope() instanceof \PHPCDI\API\Inject\Dependent) {
+        if($this->getScope() instanceof Annotations\Dependent) {
             $creationalContext->release();
         }
         
@@ -93,10 +98,10 @@ abstract class AbstractProducer implements \PHPCDI\API\Inject\SPI\Bean {
     }
 
     public function isNullable() {
-        return !\PHPCDI\Util\ReflectionUtil::isPrimitiveType($this->member->getBaseType());
+        return !ReflectionUtil::isPrimitiveType($this->member->getBaseType());
     }
     
-    public function setProducer(\PHPCDI\API\Inject\SPI\Producer $producer) {
+    public function setProducer(Producer $producer) {
         $this->producer = $producer;
     }
     

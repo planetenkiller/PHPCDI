@@ -2,6 +2,8 @@
 
 namespace PHPCDI\Resolution;
 
+use PHPCDI\Util\Beans as BeanUtil;
+
 /**
  * A Decorator reslover based on types/qualifiers of the Decorators.
  */
@@ -21,7 +23,7 @@ class TypeSafeDecoratorReslover implements Resolver {
 
         foreach($this->decorators as $decorator) {
             if(\in_array($decorator->getDelegateType(), $beanType)) {
-                if(!\PHPCDI\Util\Beans::containsAllQualifiers($decorator->getDelegateQualifiers(), $qualifiers)) {
+                if(!BeanUtil::containsAllQualifiers($decorator->getDelegateQualifiers(), $qualifiers)) {
                     continue;
                 }
 

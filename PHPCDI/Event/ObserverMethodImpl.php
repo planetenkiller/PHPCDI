@@ -2,22 +2,28 @@
 
 namespace PHPCDI\Event;
 
-use PHPCDI\API\Inject\SPI\AnnotatedMethod;
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\AnnotatedMethod;
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\ObserverMethod;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\Beans as BeanUtil;
+use PHPCDI\API\Annotations;
+use PHPCDI\API\DefinitionException;
 
 /**
  * Default implementation of ObserverMethod;
  */
-class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
+class ObserverMethodImpl implements ObserverMethod {
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\Bean
+     * @var \PHPCDI\SPI\Bean
      */
     private $declaringBean;
     
     /**
      *
-     * @var \PHPCDI\API\Inject\SPI\AnnotatedMethod
+     * @var \PHPCDI\SPI\AnnotatedMethod
      */
     private $method;
     private $qualifiers;
@@ -26,11 +32,11 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
     private $typeFilter;
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\BeanManager
+     * @var \PHPCDI\Manager\BeanManager
      */
     private $beanManager;
     
-    public function __construct(Bean $declaringBean, AnnotatedMethod $method, \PHPCDI\API\Inject\SPI\BeanManager $beanManager) {
+    public function __construct(Bean $declaringBean, AnnotatedMethod $method, BeanManager $beanManager) {
         $this->declaringBean = $declaringBean;
         $this->beanManager = $beanManager;
         $this->method = $method;
@@ -38,20 +44,20 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
         $params = $method->getParameters();
         $param = $params[0];
         
-        $this->qualifiers = \PHPCDI\Util\Annotations::getQualifiers($param);
+        $this->qualifiers = AnnotationUtil::getQualifiers($param);
         $this->type = $param->getBaseType();
         
-        if($param->isAnnotationPresent(\PHPCDI\API\Inject\TypeFilter::className())) {
-            $this->typeFilter = $param->getAnnotation(\PHPCDI\API\Inject\TypeFilter::className())->value;
+        if($param->isAnnotationPresent(Annotations\TypeFilter::className())) {
+            $this->typeFilter = $param->getAnnotation(Annotations\TypeFilter::className())->value;
             
             if(empty($this->typeFilter)) {
-                throw new \PHPCDI\API\DefinitionException('TypeFilter annotation must have an value in ' . $method->getBaseType() . '::' . $method->getPHPMember()->name);
+                throw new DefinitionException('TypeFilter annotation must have an value in ' . $method->getBaseType() . '::' . $method->getPHPMember()->name);
             }
         }
         
-        $observesAnnotation = $param->getAnnotation(\PHPCDI\API\Inject\Observes::className());
+        $observesAnnotation = $param->getAnnotation(Annotations\Observes::className());
         if($observesAnnotation == null) {
-            throw new \PHPCDI\API\Inject\DefinitionException('First parameter of an observer method must have the @Observes annotation: [' . $method . ']');
+            throw new DefinitionException('First parameter of an observer method must have the @Observes annotation: [' . $method . ']');
         }
         
         if(!empty($observesAnnotation->value)) {
@@ -60,7 +66,7 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
             } else if($observesAnnotation->value == 'always') {
                 $this->reception = self::RECEPTION_ALWAYS;
             } else {
-                throw new \PHPCDI\API\Inject\DefinitionException('Invalid value for @Observes annotation value [' . $method . ']:' . $observesAnnotation->value);
+                throw new DefinitionException('Invalid value for @Observes annotation value [' . $method . ']:' . $observesAnnotation->value);
             }
         }
     }
@@ -102,7 +108,7 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
     }
     
     private function sendEvent($eventData, $obj, $ctx) {
-        $injectionPoints = \PHPCDI\Util\Beans::getParameterInjectionPoints($this->declaringBean, $this->method);
+        $injectionPoints = BeanUtil::getParameterInjectionPoints($this->declaringBean, $this->method);
         unset($injectionPoints[0]);// first injection point is the parameter with @Disposes
 
         $values = array($eventData);
@@ -112,7 +118,7 @@ class ObserverMethodImpl implements \PHPCDI\API\Inject\SPI\ObserverMethod {
         
         $this->method->getPHPMember()->invokeArgs($obj, $values);
         
-        if($ctx != null && $this->declaringBean->getScope() instanceof \PHPCDI\API\Inject\Dependent) {
+        if($ctx != null && $this->declaringBean->getScope() instanceof Annotations\Dependent) {
             $ctx->release();
         }
     }

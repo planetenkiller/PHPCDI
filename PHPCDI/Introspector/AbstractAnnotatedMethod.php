@@ -2,8 +2,10 @@
 
 namespace PHPCDI\Introspector;
 
+use PHPCDI\SPI\AnnotatedCallable;
+use PHPCDI\SPI\AnnotatedType;
 
-abstract class AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\AnnotatedCallable {
+abstract class AbstractAnnotatedMethod implements AnnotatedCallable {
 
     private $annotations;
     private $baseType;
@@ -12,7 +14,7 @@ abstract class AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\Annotat
     private $reflectionMethod;
     private $parameters = null;
 
-    public function __construct($annotations, $baseType, $allTypes, \PHPCDI\API\Inject\SPI\AnnotatedType $class, \ReflectionMethod $method) {
+    public function __construct($annotations, $baseType, $allTypes, AnnotatedType $class, \ReflectionMethod $method) {
         $this->annotations = $annotations;
         $this->baseType = $baseType;
         $this->allTypes = $allTypes;

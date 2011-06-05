@@ -9,7 +9,7 @@ class UserDao {
     /**
      * @Inject
      * @Event("PHPCDI\Example\Events\UserEvent")
-     * @var PHPCDI\API\Event\Event
+     * @var PHPCDI\API\Event
      */
     private $userEvent;
 

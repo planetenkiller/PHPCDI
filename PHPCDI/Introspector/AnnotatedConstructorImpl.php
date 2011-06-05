@@ -2,14 +2,19 @@
 
 namespace PHPCDI\Introspector;
 
-class AnnotatedConstructorImpl extends AbstractAnnotatedMethod implements \PHPCDI\API\Inject\SPI\AnnotatedConstructor {
+use PHPCDI\SPI\AnnotatedConstructor;
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\Util\Annotations as AnnotationUtil;
+use PHPCDI\Util\ReflectionUtil;
 
-    public function __construct(\PHPCDI\API\Inject\SPI\AnnotatedType $class, \ReflectionMethod $method) {
-        $returnType = \PHPCDI\Util\Annotations::getReturnType($method);
-        parent::__construct(\PHPCDI\Util\Annotations::reader()->getMethodAnnotations($method),
+class AnnotatedConstructorImpl extends AbstractAnnotatedMethod implements AnnotatedConstructor {
+
+    public function __construct(AnnotatedType $class, \ReflectionMethod $method) {
+        $returnType = AnnotationUtil::getReturnType($method);
+        parent::__construct(AnnotationUtil::reader()->getMethodAnnotations($method),
                             !empty($returnType)? $returnType : 'mixed',
                             !empty($returnType)? 
-                                \PHPCDI\Util\ReflectionUtil::getClassNames(new \ReflectionClass($returnType))
+                                ReflectionUtil::getClassNames(new \ReflectionClass($returnType))
                               :
                                 array('mixed'),
                             $class,

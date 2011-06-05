@@ -2,7 +2,9 @@
 
 namespace PHPCDI\Decorator;
 
-class InterceptorAndDecoratorProxyMethodHandler implements \PHPCDI\Proxy\MethodHandler {
+use PHPCDI\Proxy\MethodHandler;
+
+class InterceptorAndDecoratorProxyMethodHandler implements MethodHandler {
     private static $disabledHandlers;
     
     /**

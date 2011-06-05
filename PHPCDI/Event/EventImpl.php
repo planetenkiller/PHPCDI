@@ -2,9 +2,12 @@
 
 namespace PHPCDI\Event;
 
-use PHPCDI\API\Event\Event;
-use PHPCDI\API\Inject\SPI\BeanManager;
-use PHPCDI\API\Inject\SPI\InjectionPoint;
+use PHPCDI\API\Event;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\SPI\InjectionPoint;
+use PHPCDI\API\Annotations;
+use PHPCDI\API\DefinitionException;
+use PHPCDI\Injection\EventFacadeInjectionPoint;
 
 /**
  * Default implementation of event interface.
@@ -12,12 +15,12 @@ use PHPCDI\API\Inject\SPI\InjectionPoint;
 class EventImpl implements Event {
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\InjectionPoint 
+     * @var \PHPCDI\SPI\InjectionPoint
      */
     private $injectionPoint;
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\BeanManager
+     * @var \PHPCDI\Manager\BeanManager
      */
     private $beanManager;
     
@@ -30,9 +33,9 @@ class EventImpl implements Event {
         $this->injectionPoint = $ij;
         $this->beanManager = $beanManager;
         
-        $eventAnnotation = $ij->getAnnotated()->getAnnotation(\PHPCDI\API\Inject\Event::className());
+        $eventAnnotation = $ij->getAnnotated()->getAnnotation(Annotations\Event::className());
         if($eventAnnotation == null || empty($eventAnnotation->value)) {
-            throw new \PHPCDI\API\Inject\DefinitionException('event injection point [' . $ij . '] must declare its event data type with a @Event annotation');
+            throw new DefinitionException('event injection point [' . $ij . '] must declare its event data type with a @Event annotation');
         }
         $this->eventDataType = $eventAnnotation->value;
     }
@@ -46,7 +49,7 @@ class EventImpl implements Event {
     }
 
     public function selectEvent($eventDataClassname, array $qualifiers) {
-        return new EventImpl(new \PHPCDI\Injection\EventFacadeInjectionPoint($this->injectionPoint, $qualifiers), 
+        return new EventImpl(new EventFacadeInjectionPoint($this->injectionPoint, $qualifiers), 
                              $this->beanManager);
     }
 }

@@ -2,10 +2,15 @@
 
 namespace PHPCDI\Injection;
 
-class MethodProducer implements \PHPCDI\API\Inject\SPI\Producer {
+use PHPCDI\SPI\Producer;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\Bean\ProducerMethod;
+use PHPCDI\Util\Beans as BeanUtil;
+
+class MethodProducer implements Producer {
     private $producer;
     
-    public function __construct(\PHPCDI\Bean\ProducerMethod $producer) {
+    public function __construct(ProducerMethod $producer) {
         $this->producer = $producer;
     }
 
@@ -15,7 +20,7 @@ class MethodProducer implements \PHPCDI\API\Inject\SPI\Producer {
             $declaringBeanObj = $this->producer->getBeanManager()->getRefernce($this->producer->getDeclaringBean(), $this->producer->getMember()->getBaseType(), $creationalContext);
             $reflectionMethod = $this->producer->getDisposer()->getPHPMember();
 
-            $injectionPoints = \PHPCDI\Util\Beans::getParameterInjectionPoints($this->producer->getDeclaringBean(), $this->producer->getMember());
+            $injectionPoints = BeanUtil::getParameterInjectionPoints($this->producer->getDeclaringBean(), $this->producer->getMember());
             unset($injectionPoints[0]);// first injection point is the parameter with @Disposes
 
             $values = array($instance);
@@ -32,7 +37,7 @@ class MethodProducer implements \PHPCDI\API\Inject\SPI\Producer {
         return $this->producer->getPhpCdiInjectionPoints();
     }
 
-    public function produce($creationalContext) {
+    public function produce(CreationalContext $creationalContext) {
         $declaringBeanObj = $this->producer
                                     ->getBeanManager()
                                     ->getRefernce($this->producer->getDeclaringBean(), 

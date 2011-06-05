@@ -4,6 +4,10 @@ namespace PHPCDI\API;
 
 class DefinitionException extends \Exception {
     
+    public function __construct($message) {
+        parent::__construct($message);
+    }
+    
     public static function fromExceptionList(array $exceptions) {
         $message = "definition exceptions: \n";
         
@@ -12,10 +16,6 @@ class DefinitionException extends \Exception {
         }
         
         return new DefinitionException($message);
-    }
-    
-    public function __construct($message) {
-        parent::__construct($message);
     }
 }
 

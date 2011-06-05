@@ -2,16 +2,17 @@
 
 namespace PHPCDI\Util;
 
-use PHPCDI\API\Inject\SPI\Bean;
-use PHPCDI\API\Inject\SPI\AnnotatedCallable;
-use PHPCDI\API\Inject\SPI\AnnotatedConstructor;
+use PHPCDI\SPI\Bean;
+use PHPCDI\SPI\AnnotatedCallable;
+use PHPCDI\SPI\AnnotatedConstructor;
 use PHPCDI\Injection\ParameterInjectionPoint;
-use PHPCDI\API\Inject\SPI\AnnotatedType;
-use PHPCDI\API\Context\SPI\CreationalContext;
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\SPI\Context\CreationalContext;
+use PHPCDI\API\Annotations as AnnotationsPkg;
+use PHPCDI\API\DefinitionException;
+use PHPCDI\Injection\FieldInjectionPoint;
+use PHPCDI\Manager\BeanManager;
 
-/**
- *
- */
 abstract class Beans {
     public static function getParameterInjectionPoints(Bean $declaringBean, AnnotatedCallable $constructor)
     {
@@ -34,7 +35,7 @@ abstract class Beans {
     {
         if($constructor == null) {
             return array();
-        } else if($constructor->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) {
+        } else if($constructor->isAnnotationPresent(AnnotationsPkg\Inject::className())) {
             $injectionPoints = array();
             foreach($constructor->getParameters() as $parameter) {
                 $injectionPoints[] = new ParameterInjectionPoint($declaringBean, $parameter);
@@ -42,7 +43,7 @@ abstract class Beans {
 
             return $injectionPoints;
         } else if(\count($constructor->getParameters()) > 0) {
-            throw new \PHPCDI\API\DefinitionException('Found non @Inject constructor with at leas one paramter');
+            throw new DefinitionException('Found non @Inject constructor with at leas one paramter');
         } else {
             return array();
         }
@@ -55,7 +56,7 @@ abstract class Beans {
         //TODO check superclass too
         foreach($class->getMethods() as $method) {
             if(!$method->isStatic()
-                && $method->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) { //TODO: not Produces,Disposes,Observes
+                && $method->isAnnotationPresent(AnnotationsPkg\Inject::className())) { //TODO: not Produces,Disposes,Observes
                 $initializerMethodsList[] = $method;
             }
         }
@@ -68,15 +69,15 @@ abstract class Beans {
 
         //TODO check superclass too
         foreach($class->getFields() as $field) {
-            if(!$field->isStatic() && $field->isAnnotationPresent(\PHPCDI\API\Inject\Inject::className())) { //TODO: not producer
-                $fields[] = new \PHPCDI\Injection\FieldInjectionPoint($declaringBean, $field);
+            if(!$field->isStatic() && $field->isAnnotationPresent(AnnotationsPkg\Inject::className())) { //TODO: not producer
+                $fields[] = new FieldInjectionPoint($declaringBean, $field);
             }
         }
 
         return $fields;
     }
 
-    public static function injectFieldsAndInitializers($obj, CreationalContext $ctx, \PHPCDI\Bean\BeanManager $mgr, array $injectableFields, array $initializerMethods) {
+    public static function injectFieldsAndInitializers($obj, CreationalContext $ctx, BeanManager $mgr, array $injectableFields, array $initializerMethods) {
         foreach($injectableFields as $field) {
             $field->inject($obj, $mgr, $ctx);
         }
@@ -97,14 +98,14 @@ abstract class Beans {
 
         //TODO check superclass too
         foreach($class->getMethods() as $method) {
-            if($method->isAnnotationPresent(\PHPCDI\API\Inject\PostConstruct::className())) {
+            if($method->isAnnotationPresent(AnnotationsPkg\PostConstruct::className())) {
                 $methods[] = $method;
             }
         }
 
         //TODO only one postconstruct per (super)class
         if(count($methods) > 1) {
-            throw new \PHPCDI\API\Inject\DefinitionException('too many post construcct methods in class '.$class->getPHPClass()->name);
+            throw new DefinitionException('too many post construcct methods in class '.$class->getPHPClass()->name);
         }
 
         return $methods;

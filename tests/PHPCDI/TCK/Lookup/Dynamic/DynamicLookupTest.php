@@ -2,7 +2,7 @@
 
 namespace PHPCDI\TCK\Lookup\Dynamic;
 
-use PHPCDI\API\Inject\DefaultObj;
+use PHPCDI\API\Annotations\DefaultObj;
 
 require_once __DIR__ . '/../../../../bootstrap.php';
 

@@ -2,7 +2,9 @@
 
 namespace PHPCDI\Decorator;
 
-class DecoratorProxyHandler implements \PHPCDI\Proxy\MethodHandler {
+use PHPCDI\Proxy\MethodHandler;
+
+class DecoratorProxyHandler implements MethodHandler {
     private $delegate;
     
     public function __construct($delegate) {

@@ -2,7 +2,10 @@
 
 namespace PHPCDI\Bootstrap\Event;
 
-class ProcessInjectionTargetImpl implements \PHPCDI\API\Event\ProcessInjectionTarget {
+use PHPCDI\API\Event\ProcessInjectionTarget;
+use PHPCDI\SPI\InjectionTarget;
+
+class ProcessInjectionTargetImpl implements ProcessInjectionTarget {
     private $erros = array();
     private $bean;
     
@@ -22,7 +25,7 @@ class ProcessInjectionTargetImpl implements \PHPCDI\API\Event\ProcessInjectionTa
         return $this->bean->getInjectionTarget();
     }
     
-    public function setInjectionTarget(\PHPCDI\API\Inject\SPI\InjectionTarget $injectionTarget) {
+    public function setInjectionTarget(InjectionTarget $injectionTarget) {
         $this->bean->setInjectionTarget($injectionTarget);
     }
     

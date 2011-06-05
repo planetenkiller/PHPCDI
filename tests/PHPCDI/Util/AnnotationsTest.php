@@ -2,6 +2,8 @@
 
 namespace PHPCDI\Util;
 
+use PHPCDI\API\Annotations as AnnotationsPkg;
+
 require_once __DIR__ . '/../../bootstrap.php';
 
 /**
@@ -10,8 +12,8 @@ require_once __DIR__ . '/../../bootstrap.php';
 class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetQualifiersOnParamteter() {
-        $param = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedParameter');
-        $method = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedCallable');
+        $param = $this->getMock('PHPCDI\SPI\AnnotatedParameter');
+        $method = $this->getMock('PHPCDI\SPI\AnnotatedCallable');
 
         $param->expects($this->once())
             ->method('getDeclaringCallable')
@@ -30,11 +32,11 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
+        $this->assertInstanceOf(AnnotationsPkg\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testGetQualifiersOnClass() {
-        $field = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedType');
+        $field = $this->getMock('PHPCDI\SPI\AnnotatedType');
 
         $field->expects($this->once())
             ->method('getPHPClass')
@@ -44,11 +46,11 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
+        $this->assertInstanceOf(AnnotationsPkg\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testGetQualifiersOnField() {
-        $class = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedField');
+        $class = $this->getMock('PHPCDI\SPI\AnnotatedField');
 
         $class->expects($this->once())
             ->method('getPHPMember')
@@ -58,7 +60,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($qualifiers);
         $this->assertEquals(1, count($qualifiers));
-        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $qualifiers[0]);
+        $this->assertInstanceOf(AnnotationsPkg\DefaultObj::className(), $qualifiers[0]);
     }
 
     public function testIsQualifier() {
@@ -78,7 +80,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetStereotypes() {
-        $class = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedType');
+        $class = $this->getMock('PHPCDI\SPI\AnnotatedType');
 
         $class->expects($this->once())
             ->method('getPHPClass')
@@ -88,13 +90,13 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($stereotypes);
         $this->assertEquals(2, count($stereotypes));
-        $this->assertInstanceOf(\PHPCDI\API\Inject\DefaultObj::className(), $stereotypes[\PHPCDI\API\Inject\DefaultObj::className()]);
-        $this->assertInstanceOf(\PHPCDI\API\Inject\Any::className(), $stereotypes[\PHPCDI\API\Inject\Any::className()]);
+        $this->assertInstanceOf(AnnotationsPkg\DefaultObj::className(), $stereotypes[AnnotationsPkg\DefaultObj::className()]);
+        $this->assertInstanceOf(AnnotationsPkg\Any::className(), $stereotypes[AnnotationsPkg\Any::className()]);
     }
 
     public function testIsScope() {
-        $this->assertTrue(Annotations::isScope(new \ReflectionClass(\PHPCDI\API\Inject\ApplicationScoped::className())));
-        $this->assertTrue(Annotations::isScope(new \ReflectionClass(\PHPCDI\API\Inject\Dependent::className())));
+        $this->assertTrue(Annotations::isScope(new \ReflectionClass(AnnotationsPkg\ApplicationScoped::className())));
+        $this->assertTrue(Annotations::isScope(new \ReflectionClass(AnnotationsPkg\Dependent::className())));
     }
 
     public function testIsScopeNonScopeAnnotations() {
@@ -102,7 +104,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetScope() {
-        $class = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedType');
+        $class = $this->getMock('PHPCDI\SPI\AnnotatedType');
 
         $class->expects($this->atLeastOnce())
             ->method('getPHPClass')
@@ -111,11 +113,11 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
         $scope = Annotations::getScope($class);
 
         $this->assertNotNull($scope);
-        $this->assertEquals(\PHPCDI\API\Inject\ApplicationScoped::className(), $scope);
+        $this->assertEquals(AnnotationsPkg\ApplicationScoped::className(), $scope);
     }
 
     public function testGetScopedDefaultScope() {
-        $class = $this->getMock('PHPCDI\API\Inject\SPI\AnnotatedType');
+        $class = $this->getMock('PHPCDI\SPI\AnnotatedType');
 
         $class->expects($this->atLeastOnce())
             ->method('getPHPClass')
@@ -124,7 +126,7 @@ class AnnotationsTest extends \PHPUnit_Framework_TestCase {
         $scope = Annotations::getScope($class);
 
         $this->assertNotNull($scope);
-        $this->assertEquals(\PHPCDI\API\Inject\Dependent::className(), $scope);
+        $this->assertEquals(AnnotationsPkg\Dependent::className(), $scope);
     }
 }
 

@@ -2,19 +2,19 @@
 
 namespace PHPCDI\Context;
 
-use PHPCDI\API\Context\SPI\Contextual;
-use PHPCDI\API\Context\SPI\CreationalContext;
+use PHPCDI\SPI\Context\Contextual;
+use PHPCDI\SPI\Context\CreationalContext;
 
 class ContextualInstance {
     /**
-     * @var \PHPCDI\API\Context\SPI\Contextual
+     * @var \PHPCDI\SPI\Context\Contextual
      */
     private $contextual;
 
     private $instance;
 
     /**
-     * @var \PHPCDI\API\Context\SPI\CreationalContext
+     * @var \PHPCDI\SPI\Context\CreationalContext
      */
     private $creationalContext;
 
@@ -25,7 +25,7 @@ class ContextualInstance {
     }
 
     /**
-     * @return \PHPCDI\API\Context\SPI\Contextual
+     * @return \PHPCDI\SPI\Context\Contextual
      */
     public function getContextual() {
         return $this->contextual;
@@ -36,7 +36,7 @@ class ContextualInstance {
     }
 
     /**
-     * @return \PHPCDI\API\Context\SPI\CreationalContext
+     * @return \PHPCDI\SPI\Context\CreationalContext
      */
     public function getCreationalContext() {
         return $this->creationalContext;

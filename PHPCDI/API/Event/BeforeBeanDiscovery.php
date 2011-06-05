@@ -2,7 +2,9 @@
 
 namespace PHPCDI\API\Event;
 
+use PHPCDI\SPI\AnnotatedType;
+
 interface BeforeBeanDiscovery {
-    public function addAnnotatedType(\PHPCDI\API\Inject\SPI\AnnotatedType $annotatedType);
+    public function addAnnotatedType(AnnotatedType $annotatedType);
 }
 

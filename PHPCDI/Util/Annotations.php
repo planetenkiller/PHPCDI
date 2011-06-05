@@ -2,16 +2,14 @@
 
 namespace PHPCDI\Util;
 
-use PHPCDI\API\Inject\SPI\Annotated;
-use PHPCDI\API\Inject\SPI\AnnotatedParameter;
-use PHPCDI\API\Inject\SPI\AnnotatedType;
-use PHPCDI\API\Inject\SPI\AnnotatedField;
-use PHPCDI\API\Inject\SPI\AnnotatedCallable;
-use PHPCDI\API\Inject\Stereotype;
+use PHPCDI\SPI\Annotated;
+use PHPCDI\SPI\AnnotatedParameter;
+use PHPCDI\SPI\AnnotatedType;
+use PHPCDI\SPI\AnnotatedField;
+use PHPCDI\SPI\AnnotatedCallable;
+use PHPCDI\API\Annotations as AnnotationsPkg;
+use PHPCDI\API\DefinitionException;
 
-/**
- *
- */
 abstract class Annotations {
     public static function getQualifiers(Annotated $annotatedType) {
         if($annotatedType instanceof AnnotatedParameter) {
@@ -21,7 +19,7 @@ abstract class Annotations {
             $annotations = $reader->getMethodAnnotations($method->getPHPMember());
             $qualifierAnnotations = array();
             foreach($annotations as $anno) {
-                if($anno instanceof \PHPCDI\API\Inject\P && $anno->name == $annotatedType->getName()) {
+                if($anno instanceof AnnotationsPkg\P && $anno->name == $annotatedType->getName()) {
                     $data = (array)$anno->value;
                     foreach($data as $obj) {
                         if(self::isQualifier(new \ReflectionClass($obj))) {
@@ -70,7 +68,7 @@ abstract class Annotations {
 
     public static function isQualifier(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $annotation = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\Qualifier::className());
+        $annotation = $reader->getClassAnnotation($annotationClass, AnnotationsPkg\Qualifier::className());
         return $annotation != null;
     }
 
@@ -81,7 +79,7 @@ abstract class Annotations {
         if(self::$readerCache == null) {
             $reader = new \Doctrine\Common\Annotations\AnnotationReader(null, new AnnotationParser());
             $reader->setAutoloadAnnotations(true);
-            $reader->setDefaultAnnotationNamespace('PHPCDI\API\Inject\\');
+            $reader->setDefaultAnnotationNamespace('PHPCDI\API\Annotations\\');
             self::$readerCache = $reader;
         }
         return self::$readerCache;
@@ -91,7 +89,7 @@ abstract class Annotations {
 
     public static function isStereotype(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $annotation = $reader->getClassAnnotation($annotationClass, Stereotype::className());
+        $annotation = $reader->getClassAnnotation($annotationClass, AnnotationsPkg\Stereotype::className());
         return $annotation != null;
     }
 
@@ -147,7 +145,7 @@ abstract class Annotations {
         foreach($annos as $anno) {
             if(self::isStereotype(new \ReflectionClass($anno)) && !isset($stereotypeAnnotations[\get_class($anno)])) {
                 self::getStereotypeHisAnnotations($stereotypeAnnotations, new \ReflectionClass($anno));
-            } else if(!($anno instanceof Stereotype)) {
+            } else if(!($anno instanceof AnnotationsPkg\Stereotype)) {
                 $stereotypeAnnotations[\get_class($anno)] = $anno;
             }
         }
@@ -155,8 +153,8 @@ abstract class Annotations {
 
     public static function isScope(\ReflectionClass $annotationClass) {
         $reader = self::reader();
-        $scope = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\Scope::className());
-        $normalScope = $reader->getClassAnnotation($annotationClass, \PHPCDI\API\Inject\NormalScope::className());
+        $scope = $reader->getClassAnnotation($annotationClass, AnnotationsPkg\Scope::className());
+        $normalScope = $reader->getClassAnnotation($annotationClass, AnnotationsPkg\NormalScope::className());
         return $scope != null || $normalScope != null;
     }
 
@@ -177,7 +175,7 @@ abstract class Annotations {
                 foreach($annos as $anno) {
                     if(self::isScope(new \ReflectionClass($anno))) {
                         if($scope != null) {
-                            throw new \PHPCDI\API\Inject\DefinitionException('Bean '.$annotated->getPHPClass()->name.' contains more than one scope annotation');
+                            throw new DefinitionException('Bean '.$annotated->getPHPClass()->name.' contains more than one scope annotation');
                         } else {
                             $scope = $anno;
                             break;
@@ -190,7 +188,7 @@ abstract class Annotations {
             foreach($annos as $anno) {
                 if(!is_array($anno) && self::isScope(new \ReflectionClass($anno))) {
                     if($scope != null) {
-                        throw new \PHPCDI\API\Inject\DefinitionException('Producer method '.$annotated->getPHPMember()->name.' of bean '.$annotated->getPHPMember()->class.' contains more than one scope annotation');
+                        throw new DefinitionException('Producer method '.$annotated->getPHPMember()->name.' of bean '.$annotated->getPHPMember()->class.' contains more than one scope annotation');
                     } else {
                         $scope = $anno;
                         break;
@@ -202,7 +200,7 @@ abstract class Annotations {
             foreach($annos as $anno) {
                 if(self::isScope(new \ReflectionClass($anno))) {
                     if($scope != null) {
-                        throw new \PHPCDI\API\Inject\DefinitionException('Producer field '.$annotated->getPHPMember()->name.' of bean '.$annotated->getPHPMember()->class.' contains more than one scope annotation');
+                        throw new DefinitionException('Producer field '.$annotated->getPHPMember()->name.' of bean '.$annotated->getPHPMember()->class.' contains more than one scope annotation');
                     } else {
                         $scope = $anno;
                         break;
@@ -212,7 +210,7 @@ abstract class Annotations {
         }
 
         if($scope == null && $useDefault) {
-            $scope = new \PHPCDI\API\Inject\Dependent(array());
+            $scope = new AnnotationsPkg\Dependent(array());
         } 
         
         if($scope == null) {

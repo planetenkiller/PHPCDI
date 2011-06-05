@@ -2,30 +2,34 @@
 
 namespace PHPCDI\Bean\Builtin;
 
-use PHPCDI\API\Inject\SPI\Bean;
+use PHPCDI\SPI\Bean;
+use PHPCDI\Manager\BeanManager;
+use PHPCDI\Event\EventImpl;
+use PHPCDI\API\Annotations as Annotations;
+use PHPCDI\SPI\Context\CreationalContext;
 
 class EventBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     
     /**
-     * @var \PHPCDI\Bean\BeanManager 
+     * @var \PHPCDI\Manager\BeanManager$
      */
     private $beanManager;
     
-    public function __construct(\PHPCDI\Bean\BeanManager $beanManager) {
+    public function __construct(BeanManager $beanManager) {
         $this->beanManager = $beanManager;
     }
 
-    public function create($creationalContext) {
+    public function create(CreationalContext $creationalContext) {
         $ij = $this->beanManager->getCurrentInjectionPoint();
         
         if($ij == null) {
             return null;
         } else {
-            return new \PHPCDI\Event\EventImpl($ij, $this->beanManager);
+            return new EventImpl($ij, $this->beanManager);
         }
     }
 
-    public function destroy($instance, $creationalContext) {
+    public function destroy($instance, CreationalContext $creationalContext) {
         $creationalContext->release();
     }
 
@@ -42,11 +46,11 @@ class EventBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getQualifiers() {
-        return array(new \PHPCDI\API\Inject\Any(array()));
+        return array(new Annotations\Any(array()));
     }
 
     public function getScope() {
-        return \PHPCDI\API\Inject\Dependent::className();
+        return Annotations\Dependent::className();
     }
 
     public function getStereotypes() {
@@ -54,7 +58,7 @@ class EventBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
 
     public function getTypes() {
-        return array('PHPCDI\API\Event\Event', 'mixed');
+        return array('PHPCDI\API\Event', 'mixed');
     }
 
     public function isAlternative() {
@@ -66,6 +70,6 @@ class EventBean implements Bean, DynamicLookupUnsupported, BuiltinBean {
     }
     
     public function __toString() {
-        return "Builtin Bean for class PHPCDI\API\Event\Event";
+        return "Builtin Bean for class PHPCDI\API\Event";
     }
 }

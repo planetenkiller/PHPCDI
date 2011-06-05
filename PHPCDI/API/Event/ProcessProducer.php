@@ -2,19 +2,21 @@
 
 namespace PHPCDI\API\Event;
 
+use PHPCDI\SPI\Producer;
+
 interface ProcessProducer {
     /**
-     * @return \PHPCDI\API\Inject\SPI\AnnotatedMember
+     * @return \PHPCDI\SPI\AnnotatedMember
      */
     public function getAnnotatedMember();
     
     /**
-     * @return \PHPCDI\API\Inject\SPI\Producer
+     * @return \PHPCDI\SPI\Producer
      */
     public function getProducer();
     
     
-    public function setProducer(\PHPCDI\API\Inject\SPI\Producer $producer);
+    public function setProducer(Producer $producer);
     
     
     public function addDefinitionError(\Exception $e);

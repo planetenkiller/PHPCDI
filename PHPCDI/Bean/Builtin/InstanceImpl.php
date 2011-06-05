@@ -2,22 +2,25 @@
 
 namespace PHPCDI\Bean\Builtin;
 
-use PHPCDI\API\Instance\Instance;
+use PHPCDI\API\Instance;
+
+use PHPCDI\API\UnsatisfiedResolutionException;
+use PHPCDI\Injection\InstanceFacadeInjectionPoint;
 
 class InstanceImpl implements Instance {
     
     /**
-     * @var \PHPCDI\API\Inject\SPI\InjectionPoint
+     * @var \PHPCDI\SPI\InjectionPoint
      */
     private $ij;
     
     /**
-     * @var \PHPCDI\Bean\BeanManager
+     * @var \PHPCDI\Manager\BeanManager
      */
     private $beanManager;
     
     /**
-     * @var \PHPCDI\API\Context\SPI\CreationalContext 
+     * @var \PHPCDI\SPI\Context\CreationalContext
      */
     private $ctx;
     
@@ -34,11 +37,12 @@ class InstanceImpl implements Instance {
         $bean = $this->beanManager->resolve($this->getBeans());
         
         if($bean == null) {
-            throw new \PHPCDI\API\UnsatisfiedResolutionException(
+            throw new UnsatisfiedResolutionException(
                     'unsatisfied dependency on injection point [' . $this->ij . ']');
         }
         
-        $newIp = new \PHPCDI\Injection\InstanceFacadeInjectionPoint($this->ij, array()); // InstanceFacadeInjectionPoint loads qualifiers via injectionpoint
+        // InstanceFacadeInjectionPoint loads qualifiers via injection point
+        $newIp = new InstanceFacadeInjectionPoint($this->ij, array()); 
         
         $this->beanManager->getInjectionPointStack()->push($newIp);
         
@@ -81,7 +85,7 @@ class InstanceImpl implements Instance {
     }
 
     public function selectInstance($subType, array $qualifiers) {
-        $ij = new \PHPCDI\Injection\InstanceFacadeInjectionPoint($this->ij, $qualifiers);
+        $ij = new InstanceFacadeInjectionPoint($this->ij, $qualifiers);
         return new InstanceImpl($ij, $subType, $this->beanManager, $this->ctx);
     }
     
