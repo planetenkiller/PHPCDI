@@ -1,22 +1,19 @@
 <?php
 
-use Doctrine\Common\ClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 use PHPCDI\API\Annotations;
 
-require '../../vendor/DoctrineCommon/Doctrine/Common/ClassLoader.php';
+require __DIR__.'/../../vendor/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-$classLoader = new ClassLoader('PHPCDI', '../..');
+$classLoader = new UniversalClassLoader();
+$classLoader->registerNamespace('PHPCDI', __DIR__ . '/../../');
+$classLoader->registerNamespace('PHPCDI\Extensions\Doctrine2', __DIR__ . '/../../Extensions/Doctrine2/src');
+$classLoader->registerNamespace('Doctrine\Common',  __DIR__ . '/../../vendor/doctrine_common/lib');
+$classLoader->registerNamespace('Doctrine\DBAL', __DIR__ . '/../../Extensions/Doctrine2/vendor/doctrine2/lib/vendor/doctrine-dbal/lib');
+$classLoader->registerNamespace('Doctrine\ORM', __DIR__ . '/../../Extensions/Doctrine2/vendor/doctrine2/lib');
+$classLoader->registerNamespace('PHPCDI\Example\Doctrine', __DIR__);
 $classLoader->register();
-$classLoader = new ClassLoader('PHPCDI\Extensions\Doctrine2', '../../Extensions/Doctrine2/src');
-$classLoader->register();
-$classLoader = new ClassLoader('Doctrine\Common', '../../vendor/DoctrineCommon');
-$classLoader->register();
-$classLoader = new ClassLoader('Doctrine\DBAL', '../../Extensions/Doctrine2/vendor');
-$classLoader->register();
-$classLoader = new ClassLoader('Doctrine\ORM', '../../Extensions/Doctrine2/vendor');
-$classLoader->register();
-$classLoader = new ClassLoader('PHPCDI\Example\Doctrine', '.');
-$classLoader->register();
+
 
 $doctrineBundle = new PHPCDI\SPI\Bootstrap\Impl\FileScanClassBundle('doctrine2', '../../Extensions/Doctrine2/src', 'PHPCDI\Extensions\Doctrine2');
 $classpathBundle = new PHPCDI\SPI\Bootstrap\Impl\FileScanClassBundle('classpath', '.', 'PHPCDI\Example\Doctrine');

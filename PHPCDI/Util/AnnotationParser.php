@@ -10,41 +10,6 @@ use PHPCDI\API\Annotations as AnnotationsPkg;
  * phpdoc @param and @return annotations.
  */
 class AnnotationParser extends \Doctrine\Common\Annotations\Parser {
-    public function Annotations()
-    {
-        $this->isNestedAnnotation = false;
-
-        $annotations = array();
-        $annot = $this->Annotation();
-
-        if ($annot !== false) {
-            $annotations[get_class($annot)] = $annot;
-            $this->getLexer()->skipUntil(Lexer::T_AT);
-        }
-
-        while ($this->getLexer()->lookahead !== null && $this->getLexer()->isNextToken(Lexer::T_AT)) {
-            $this->isNestedAnnotation = false;
-            $annot = $this->Annotation();
-
-            if ($annot !== false) {
-                // ---- change -- multiple annotation support ----
-                if(isset($annotations[get_class($annot)])) {
-                    if(\is_array($annotations[get_class($annot)])) {
-                        $annotations[get_class($annot)][] = $annot;
-                    } else {
-                        $annotations[get_class($annot)] = array($annotations[get_class($annot)], $annot);
-                    }
-                } else {
-                    $annotations[get_class($annot)] = $annot;
-                }
-                // ---- change end --------
-                $this->getLexer()->skipUntil(Lexer::T_AT);
-            }
-        }
-
-        return $annotations;
-    }
-
     public function Annotation() {
         if($this->isNestedAnnotation) {
             return parent::Annotation();

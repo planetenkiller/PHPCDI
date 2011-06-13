@@ -1,15 +1,14 @@
 <?php
 
-use Doctrine\Common\ClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 use PHPCDI\API\Annotations;
 
-require '../../vendor/DoctrineCommon/Doctrine/Common/ClassLoader.php';
+require __DIR__.'/../../vendor/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-$classLoader = new ClassLoader('PHPCDI', '../..');
-$classLoader->register();
-$classLoader = new ClassLoader('Doctrine\Common', '../../vendor/DoctrineCommon');
-$classLoader->register();
-$classLoader = new ClassLoader('PHPCDI\Example\Decorators', '.');
+$classLoader = new UniversalClassLoader();
+$classLoader->registerNamespace('PHPCDI', __DIR__ . '/../../');
+$classLoader->registerNamespace('Doctrine\Common',  __DIR__ . '/../../vendor/doctrine_common/lib');
+$classLoader->registerNamespace('PHPCDI\Example\Decorators', __DIR__);
 $classLoader->register();
 
 $deployment = new PHPCDI\SPI\Bootstrap\Impl\Deployment();

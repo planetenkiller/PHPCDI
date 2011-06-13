@@ -2,15 +2,15 @@
 
 //xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 
-use Doctrine\Common\ClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 use PHPCDI\API\Annotations;
-require '../../vendor/DoctrineCommon/Doctrine/Common/ClassLoader.php';
 
-$classLoader = new ClassLoader('PHPCDI', '../../');
-$classLoader->register();
-$classLoader = new ClassLoader('Doctrine\Common', '../../vendor/DoctrineCommon');
-$classLoader->register();
-$classLoader = new ClassLoader('PHPCDI\Example\Simple', '.');
+require __DIR__.'/../../vendor/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+
+$classLoader = new UniversalClassLoader();
+$classLoader->registerNamespace('PHPCDI', __DIR__ . '/../../');
+$classLoader->registerNamespace('Doctrine\Common',  __DIR__ . '/../../vendor/doctrine_common/lib');
+$classLoader->registerNamespace('PHPCDI\Example\Simple', __DIR__);
 $classLoader->register();
 
 $deployment = new PHPCDI\SPI\Bootstrap\Impl\Deployment();

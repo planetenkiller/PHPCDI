@@ -2,9 +2,10 @@
 
 namespace PHPCDI\TCK;
 
-use Doctrine\Common\ClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
-$classLoader = new ClassLoader('PHPCDI\TCK',  __DIR__ . '/../../');
+$classLoader = new UniversalClassLoader();
+$classLoader->registerNamespace('PHPCDI\TCK',  __DIR__ . '/../../');
 $classLoader->register();
 
 abstract class AbstractTckTest extends \PHPUnit_Framework_TestCase {

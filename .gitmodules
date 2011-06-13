@@ -1,0 +1,9 @@
+[submodule "vendor/doctrine_common"]
+	path = vendor/doctrine_common
+	url = https://github.com/doctrine/common.git
+[submodule "Extensions/Doctrine2/vendor/doctrine2"]
+	path = Extensions/Doctrine2/vendor/doctrine2
+	url = https://github.com/doctrine/doctrine2.git
+[submodule "vendor/Symfony/Component/ClassLoader"]
+	path = vendor/Symfony/Component/ClassLoader
+	url = https://github.com/symfony/ClassLoader.git
